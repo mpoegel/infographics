@@ -9,6 +9,8 @@ import (
 )
 
 const wpPoliceShootings = "https://raw.githubusercontent.com/washingtonpost/data-police-shootings/master/fatal-police-shootings-data.csv"
+const pgPoliceShootings2015 = "https://s3.amazonaws.com/postgraphics/policeshootings/policeshootings2015.json"
+const pgPoliceShootings2016 = "https://s3.amazonaws.com/postgraphics/policeshootings/policeshootings2016.json"
 
 // Pull a data source down from a uri and save it in ./data
 func fetchData(uri string, outName string) {
@@ -56,4 +58,6 @@ func fetchData(uri string, outName string) {
 
 func main() {
 	fetchData(wpPoliceShootings, "wp-police-shootings.csv")
+	fetchData(pgPoliceShootings2015, "pg-police-shootings-2015.json")
+	fetchData(pgPoliceShootings2016, "pg-police-shootings-2016.json")
 }
