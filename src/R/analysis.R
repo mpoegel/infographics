@@ -23,6 +23,7 @@ blue       <- "#303E73"
 dark.blue  <- "#07123A"
 green      <- "#2A7F41"
 gray       <- "#E2E2E3"
+dark.gray  <- "#D2D2D3"
 
 blue_theme <- function() {
   theme(
@@ -65,6 +66,23 @@ waffle_theme <- function() {
     axis.title = element_text(color = dark.blue, face = "bold", size = 13, family = "Segoe UI"),
     strip.text = element_text(family = "Segoe UI", color = "white"),
     strip.background = element_rect(fill = blue)
+  )
+}
+
+single_bar_theme <- function() {
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = gray, color = gray),
+    panel.background = element_rect(fill = gray),
+    panel.background = element_rect(fill = "white"),
+    axis.text = element_blank(),
+    plot.title = element_text(color = dark.blue, face = "bold", size = 18, vjust = 1, 
+                              family = "Segoe UI"),
+    axis.ticks = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
   )
 }
 
@@ -192,6 +210,68 @@ p5 <- iron(p2 + theme(legend.position = "none",
 p5
 dev.off()
 
+# From the US Census
+# https://www.census.gov/quickfacts/table/PST045215/00
+us.pop.race <- c("Asian"=5.6, "Black"=13.3, "Hispanic"=15.5, "Native American"=1.4, "Other"=2.6,
+                 "White"=61.6)
+us.pop.black <- us.pop.race["Black"]
+black.deaths <- race.counts["Black"] / sum(race.counts) * 100
+
+black.df <- data.frame("Count"=c(us.pop.black, black.deaths, 100 - us.pop.black, 100 - black.deaths),
+                       "Race"=c("Black", "Black", "Other", "Other"),
+                       "Label"=c("US Population", "Killed By Police"))
+
+p7 <- ggplot(black.df,
+             aes(x=Label, y=Count, fill=Race)) +
+  geom_bar(stat="identity") +
+  scale_fill_manual(values=c(blue, dark.gray)) +
+  geom_text(label=c(paste(us.pop.black, "%", sep=""),
+                    paste(round(black.deaths, digits=1), "%", sep=""), 
+                    "", ""),
+            size=10,
+            vjust=-0.5,
+            color=blue) +
+  xlab("") +
+  ylab("") +
+  ggtitle("Black Americans vs. Everyone Else") +
+  blue_theme() +
+  theme(
+    legend.position = "none",
+    panel.grid.major.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+p7
+
+
+#
+# Unarmed victims' threat level
+#
+
+unarmed.threat <- summary(wp.data.unarmed$threat_level) / length(wp.data.unarmed$id)
+
+
+#
+# Plot the mental state of the victims
+#
+
+mental.percent <- c()
+for (val in levels(wp.data$signs_of_mental_illness)) {
+  mental.percent <- append(mental.percent,
+                           length(wp.data[wp.data$signs_of_mental_illness == val, "id"]))
+}
+mental.percent <- mental.percent / length(wp.data$signs_of_mental_illness) * 100
+
+attach(wp.data)
+p6 <- ggplot(wp.data[order(signs_of_mental_illness, decreasing=FALSE), ],
+             aes(x = 1, y = id, fill = signs_of_mental_illness)) +
+  geom_bar(stat="identity") +
+  scale_fill_manual(values=c(dark.gray, blue)) +
+  xlab("") +
+  ylab("") +
+  single_bar_theme()
+p6
+
 
 #
 # Combine the plots together into an infographic
@@ -207,6 +287,10 @@ grid.rect(gp = gpar(fill = gray, col = gray))
 grid.rect(gp = gpar(fill = dark.blue, color = dark.blue),
           x = unit(0.5, "npc"), y = unit(0.95, "npc"),
           width = unit(1, "npc"), height = unit(0.15, "npc"))
+
+print(p7 + theme(plot.margin=margin(3, 0.5, 2, 0, unit="cm")),
+      vp = vplayout(4:5, 3:4))
+
 # bottom banner
 grid.rect(gp = gpar(fill = dark.blue, color = dark.blue),
           x = unit(0.5, "npc"), y = unit(0.0, "npc"),
@@ -215,9 +299,9 @@ grid.text("Black and Blue",
           vjust = 0, hjust = 0,
           x = unit(0.01, "npc"), y = unit(0.92, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 8))
-grid.text("An examination of deadly police shootings in America", 
+grid.text("An examination of deadly police encounters in America", 
           vjust = 0, hjust = 0,
-          x = unit(0.01, "npc"), y = unit(0.90, "npc"), 
+          x = unit(0.02, "npc"), y = unit(0.90, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 2))
 grid.text("Analysis by Matt Poegel", 
           vjust = 0, hjust = 0,
@@ -239,6 +323,8 @@ print(p3 + theme(legend.position = "none",
       vp = vplayout(4, 1:2))
 print(p4 + theme(plot.margin=margin(-8, 1, 0, 1, unit="cm")), 
       vp = vplayout(5, 1:2))
+print(p6 + theme(plot.margin=margin(3.5, 1.5, -2, 0.5, unit="cm")),
+      vp = vplayout(2:3, 4))
 
 grid.text(length(wp.data$id), 
           vjust = 0, hjust = 0,
@@ -248,6 +334,18 @@ grid.text("Americans killed by police\nsince January 1, 2015",
           vjust = 0, hjust = 0,
           x = unit(0.55, "npc"), y = unit(0.80, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 2))
+
+grid.text(paste(round(mental.percent[2]), "%", sep=""), 
+          vjust = 0, hjust = 0,
+          x = unit(0.81, "npc"), y = unit(0.60, "npc"), 
+          gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 3.8))
+grid.text(paste("of the victims",
+                "showed signs of",
+                "mental illness", sep="\n"), 
+          vjust = 0, hjust = 0,
+          x = unit(0.81, "npc"), y = unit(0.56, "npc"), 
+          gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 1))
+
 grid.text(length(wp.data.unarmed$id), 
           vjust = 0, hjust = 0,
           x = unit(0.02, "npc"), y = unit(0.05, "npc"), 
