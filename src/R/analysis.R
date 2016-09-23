@@ -61,7 +61,7 @@ waffle_theme <- function() {
     legend.title = element_text(face = "bold", size = 10),
     plot.background = element_rect(fill = gray, color = gray),
     plot.title = element_text(color = dark.blue, face = "bold", size = 18, vjust = 1,
-                              family = "Segoe UI", margin=margin(1,0,1,0, unit="cm")),
+                              family = "Segoe UI", margin=margin(1, 0, 0.7, 0, unit="cm")),
     axis.title = element_text(color = dark.blue, face = "bold", size = 13, family = "Segoe UI"),
     strip.text = element_text(family = "Segoe UI", color = "white"),
     strip.background = element_rect(fill = blue)
@@ -116,6 +116,32 @@ dev.off()
 
 
 #
+# Plot cumulative incidents over the months
+#
+
+cumsum.counts <- c()
+year <- getYear(first.date)
+while (year <= getYear(last.date)) {
+  x <- cumsum(incidents.by.month[ incidents.by.month$year == year, "count" ])
+  cumsum.counts <- append(cumsum.counts, x )
+  year <- year + 1
+}
+
+incidents.by.month$annual.cumsum <- cumsum.counts
+
+p2 <- ggplot(incidents.by.month,
+             aes(x=month, y=annual.cumsum, group=factor(year))) +
+  geom_point(aes(linetype=factor(year))) +
+  geom_line(stat = "identity", aes(linetype=factor(year)), color=green) +
+  scale_x_continuous(breaks=1:12, labels=month.abb) +
+  scale_linetype_discrete(name="Year") +
+  xlab("Month") +
+  ylab("Cumulative Number of Incidents") + 
+  ggtitle("Cumulative Number of Police Shootings")
+p2 <- p2 + blue_theme()
+p2
+
+#
 # Plot the race of the victims using a waffle chart
 #
 
@@ -132,13 +158,13 @@ for (race in races) {
   race.counts[race] = x
 }
 
-p2 <- waffle(race.counts / 10,
+p3 <- waffle(race.counts / 10,
              rows=7,
              size=0,
              title="Americans Killed by Police",
              xlab="1 square = 10 Americans")
-p2 <- p2 + waffle_theme()
-p2
+p3 <- p3 + waffle_theme()
+p3
 
 #
 # Plot unarmed or undetermined victims by race
@@ -151,19 +177,19 @@ for (race in races) {
   unarmed.race.counts[race] = x
 }
 
-p3 <- waffle(unarmed.race.counts,
+p4 <- waffle(unarmed.race.counts,
              rows=7,
              size=0,
              title="Unarmed Americans Killed by Police",
              xlab="1 square = 1 American")
-p3 <- p3 + waffle_theme()
-p3
+p4 <- p4 + waffle_theme()
+p4
 
 png("./reports/figures/incidents_by_race.png")
-p4 <- iron(p2 + theme(legend.position = "none",
+p5 <- iron(p2 + theme(legend.position = "none",
                       plot.title = element_text(margin=margin(0.5,0,0.2,0, unit="cm"))),
            p3 + theme(plot.title = element_text(margin=margin(1,0,0.2,0, unit="cm"))))
-p4
+p5
 dev.off()
 
 
@@ -174,7 +200,7 @@ vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 
 png("./reports/figures/infographic1.png", width = 10, height = 20, res = 300, units = "in")
 grid.newpage()
-pushViewport(viewport(layout = grid.layout(nrow=5, ncol=2)))
+pushViewport(viewport(layout = grid.layout(nrow=5, ncol=4)))
 grid.rect(gp = gpar(fill = gray, col = gray))
 
 # top banner
@@ -191,7 +217,7 @@ grid.text("Black and Blue",
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 8))
 grid.text("An examination of deadly police shootings in America", 
           vjust = 0, hjust = 0,
-          x = unit(0.01, "npc"), y = unit(0.88, "npc"), 
+          x = unit(0.01, "npc"), y = unit(0.90, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 2))
 grid.text("Analysis by Matt Poegel", 
           vjust = 0, hjust = 0,
@@ -203,13 +229,34 @@ grid.text("Source: The Washington Post - https://github.com/washingtonpost/data-
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 1.2))
 
 
-print(p1 + theme(plot.margin=margin(0, 1, 0, 1, unit="cm")), 
-      vp = vplayout(2:3, 1:2))
-print(p2 + theme(plot.margin=margin(0, 1, 0, 1, unit="cm")),
-      vp = vplayout(4, 1))
+print(p2 + theme(legend.position = "none",
+                 plot.margin=margin(2, 1, -2, 1, unit="cm")),
+      vp = vplayout(3, 1:3))
+print(p1 + theme(plot.margin=margin(2, 1, -2, 1, unit="cm")),
+      vp = vplayout(2, 1:3))
 print(p3 + theme(legend.position = "none",
-                 plot.margin=margin(-7, 1, 0, 1, unit="cm")), 
-      vp = vplayout(5, 1))
+                 plot.margin=margin(0, 1, 0, 1, unit="cm")),
+      vp = vplayout(4, 1:2))
+print(p4 + theme(plot.margin=margin(-8, 1, 0, 1, unit="cm")), 
+      vp = vplayout(5, 1:2))
+
+grid.text(length(wp.data$id), 
+          vjust = 0, hjust = 0,
+          x = unit(0.17, "npc"), y = unit(0.79, "npc"), 
+          gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 10))
+grid.text("Americans killed by police\nsince January 1, 2015", 
+          vjust = 0, hjust = 0,
+          x = unit(0.55, "npc"), y = unit(0.80, "npc"), 
+          gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 2))
+grid.text(length(wp.data.unarmed$id), 
+          vjust = 0, hjust = 0,
+          x = unit(0.02, "npc"), y = unit(0.05, "npc"), 
+          gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 6))
+grid.text(paste("unarmed Americans have been killed",
+                "by law enforcement since January 1, 2015", sep="\n"), 
+          vjust = 0, hjust = 0,
+          x = unit(0.20, "npc"), y = unit(0.06, "npc"), 
+          gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 1))
 
 dev.off()
 
