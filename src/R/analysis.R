@@ -121,13 +121,13 @@ incidents.by.month = data.frame(date, month, year, count)
 png("./reports/figures/incidents_by_month.png")
 p1 <- ggplot(incidents.by.month,
              aes(x=month, y=count, group=factor(year))) +
-      geom_point(aes(linetype=factor(year))) +
+      geom_point(aes(linetype=factor(year)), color=green) +
       geom_line(stat = "identity", aes(linetype=factor(year)), color=green) +
       scale_x_continuous(breaks=1:12, labels=month.abb) +
       scale_linetype_discrete(name="Year") +
       xlab("Month") +
       ylab("Number of Incidents") + 
-      ggtitle("Number of Police Shootings by Month")
+      ggtitle("Number of Americans Killed by Police by Month")
 p1 <- p1 + blue_theme()
 p1
 dev.off()
@@ -147,17 +147,19 @@ while (year <= getYear(last.date)) {
 
 incidents.by.month$annual.cumsum <- cumsum.counts
 
+png("./reports/figures/cumulative_by_month.png")
 p2 <- ggplot(incidents.by.month,
              aes(x=month, y=annual.cumsum, group=factor(year))) +
-  geom_point(aes(linetype=factor(year))) +
+  geom_point(aes(linetype=factor(year)), color=green) +
   geom_line(stat = "identity", aes(linetype=factor(year)), color=green) +
   scale_x_continuous(breaks=1:12, labels=month.abb) +
   scale_linetype_discrete(name="Year") +
   xlab("Month") +
   ylab("Cumulative Number of Incidents") + 
-  ggtitle("Cumulative Number of Police Shootings")
+  ggtitle("Cumulative Number of Americans Killed by Police")
 p2 <- p2 + blue_theme()
 p2
+dev.off()
 
 #
 # Plot the race of the victims using a waffle chart
@@ -204,9 +206,9 @@ p4 <- p4 + waffle_theme()
 p4
 
 png("./reports/figures/incidents_by_race.png")
-p5 <- iron(p2 + theme(legend.position = "none",
+p5 <- iron(p3 + theme(legend.position = "none",
                       plot.title = element_text(margin=margin(0.5,0,0.2,0, unit="cm"))),
-           p3 + theme(plot.title = element_text(margin=margin(1,0,0.2,0, unit="cm"))))
+           p4 + theme(plot.title = element_text(margin=margin(1,0,0.2,0, unit="cm"))))
 p5
 dev.off()
 
@@ -221,6 +223,7 @@ black.df <- data.frame("Count"=c(us.pop.black, black.deaths, 100 - us.pop.black,
                        "Race"=c("Black", "Black", "Other", "Other"),
                        "Label"=c("US Population", "Killed By Police"))
 
+png("./reports/figures/black_american_comparison.png")
 p7 <- ggplot(black.df,
              aes(x=Label, y=Count, fill=Race)) +
   geom_bar(stat="identity") +
@@ -236,12 +239,13 @@ p7 <- ggplot(black.df,
   ggtitle("Black Americans vs. Everyone Else") +
   blue_theme() +
   theme(
-    legend.position = "none",
+    legend.position = "bottom",
     panel.grid.major.y = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank()
   )
 p7
+dev.off()
 
 
 #
@@ -278,7 +282,8 @@ p6
 #
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 
-png("./reports/figures/infographic1.png", width = 10, height = 20, res = 300, units = "in")
+png("./reports/figures/black_and_blue_infographic.png", width = 10, height = 20, res = 300,
+    units = "in")
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(nrow=5, ncol=4)))
 grid.rect(gp = gpar(fill = gray, col = gray))
@@ -301,16 +306,20 @@ grid.text("Black and Blue",
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 8))
 grid.text("An examination of deadly police encounters in America", 
           vjust = 0, hjust = 0,
-          x = unit(0.02, "npc"), y = unit(0.90, "npc"), 
+          x = unit(0.02, "npc"), y = unit(0.895, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 2))
 grid.text("Analysis by Matt Poegel", 
           vjust = 0, hjust = 0,
-          x = unit(0.01, "npc"), y = unit(0.86, "npc"), 
+          x = unit(0.01, "npc"), y = unit(0.86, "npc"),
           gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 1))
-grid.text("Source: The Washington Post - https://github.com/washingtonpost/data-police-shootings/", 
+grid.text(paste("Updated:", Sys.Date()), 
+          vjust = 0, hjust = 0,
+          x = unit(0.825, "npc"), y = unit(0.86, "npc"),
+          gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 1))
+grid.text("Sources: The Washington Post, 2015 US Census",
           vjust = 0, hjust = 0, 
-          x = unit(0.01, "npc"), y = unit(0.01, "npc"), 
-          gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 1.2))
+          x = unit(0.03, "npc"), y = unit(0.012, "npc"), 
+          gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 1))
 
 
 print(p2 + theme(legend.position = "none",
