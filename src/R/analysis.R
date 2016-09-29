@@ -267,7 +267,7 @@ for (val in levels(wp.data$signs_of_mental_illness)) {
 mental.percent <- mental.percent / length(wp.data$signs_of_mental_illness) * 100
 
 attach(wp.data)
-p6 <- ggplot(wp.data[order(signs_of_mental_illness, decreasing=FALSE), ],
+p6 <- ggplot(wp.data[order(signs_of_mental_illness, decreasing=TRUE), ],
              aes(x = 1, y = id, fill = signs_of_mental_illness)) +
   geom_bar(stat="identity") +
   scale_fill_manual(values=c(dark.gray, blue)) +
@@ -308,7 +308,7 @@ grid.text("An examination of deadly police encounters in America",
           vjust = 0, hjust = 0,
           x = unit(0.02, "npc"), y = unit(0.895, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = "white", cex = 2))
-grid.text("Analysis by Matt Poegel", 
+grid.text("By Matt Poegel", 
           vjust = 0, hjust = 0,
           x = unit(0.01, "npc"), y = unit(0.86, "npc"),
           gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 1))
@@ -346,13 +346,13 @@ grid.text("Americans killed by police\nsince January 1, 2015",
 
 grid.text(paste(round(mental.percent[2]), "%", sep=""), 
           vjust = 0, hjust = 0,
-          x = unit(0.81, "npc"), y = unit(0.60, "npc"), 
+          x = unit(0.81, "npc"), y = unit(0.58, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 3.8))
 grid.text(paste("of the victims",
                 "showed signs of",
                 "mental illness", sep="\n"), 
           vjust = 0, hjust = 0,
-          x = unit(0.81, "npc"), y = unit(0.56, "npc"), 
+          x = unit(0.81, "npc"), y = unit(0.54, "npc"), 
           gp = gpar(fontfamily = "Segoe UI", col = blue, cex = 1))
 
 grid.text(length(wp.data.unarmed$id), 
