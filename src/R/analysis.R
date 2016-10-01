@@ -217,7 +217,7 @@ dev.off()
 us.pop.race <- c("Asian"=5.6, "Black"=13.3, "Hispanic"=15.5, "Native American"=1.4, "Other"=2.6,
                  "White"=61.6)
 us.pop.black <- us.pop.race["Black"]
-black.deaths <- race.counts["Black"] / sum(race.counts) * 100
+black.deaths <- unarmed.race.counts["Black"] / sum(unarmed.race.counts) * 100
 
 black.df <- data.frame("Count"=c(us.pop.black, black.deaths, 100 - us.pop.black, 100 - black.deaths),
                        "Race"=c("Black", "Black", "Other", "Other"),
@@ -236,13 +236,14 @@ p7 <- ggplot(black.df,
             color=blue) +
   xlab("") +
   ylab("") +
-  ggtitle("Black Americans vs. Everyone Else") +
+  ggtitle("Unarmed Black Americans vs. Everyone Else") +
   blue_theme() +
   theme(
     legend.position = "bottom",
     panel.grid.major.y = element_blank(),
     axis.text.y = element_blank(),
-    axis.ticks.y = element_blank()
+    axis.ticks.y = element_blank(),
+    plot.title = element_text(size = 16)
   )
 p7
 dev.off()
