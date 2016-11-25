@@ -87,6 +87,50 @@ p3
 dev.off()
 
 
+#
+# Plot the proportion of prisoners held in private prisons
+#
 
+state.prison.data$fraction.private = state.prison.data$private / state.prison.data$total
 
+png("./reports/figures/private_prison_fraction_pop_by_state.png")
+p4 <-ggplot(state.prison.data,
+            aes(x = year, y = fraction.private, group = jurisdiction)) +
+  geom_line(stat = "identity", aes(color=jurisdiction)) + 
+  xlab("Year") + 
+  ylab("Fraction in Private Prisons") +
+  ggtitle("Fraction of Prison Population in Private Prisons by State (2000-2014)")
+p4
+dev.off()
+
+labeled.states = c("New Mexico", "Alaska", "New Hampshire")
+
+png("./reports/figures/private_prison_fraction_pop_by_state_highlighted.png")
+p5 <- ggplot(state.prison.data,
+             aes(x = year, y = fraction.private, group = jurisdiction)) +
+  geom_line(stat = "identity", color = dark.gray) +
+  geom_line(stat = "identity", data = subset(state.prison.data, jurisdiction == "New Mexico"),
+            color = "red") +
+  geom_line(stat = "identity", data = subset(state.prison.data, jurisdiction == "Alaska"),
+            color = "blue") +
+  geom_line(stat = "identity", data = subset(state.prison.data, jurisdiction == "New Hampshire"),
+            color = "green") +
+  geom_label_repel(
+    data = subset(state.prison.data, jurisdiction %in% labeled.states & year == 2014),
+    aes(2014, fraction.private, label = jurisdiction),
+    color = "black",
+    fill = light.gray,
+    box.padding = unit(0.3, "cm"),
+    point.padding = unit(0.1, "cm"),
+    segment.color = 'grey50',
+    label.size = 0
+  ) +
+  xlab("Year") + 
+  ylab("Fraction in Private Prisons") +
+  ggtitle("Fraction of Prison Population in Private Prisons by State (2000-2014)")
+  theme(
+    legend.position = "none"
+  )
+p5
+dev.off()
 
