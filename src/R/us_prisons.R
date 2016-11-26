@@ -134,3 +134,34 @@ p5 <- ggplot(state.prison.data,
 p5
 dev.off()
 
+
+#
+# Plot prison population vs total population
+#
+
+world.prison.pop <- read.csv("./data/prison-population-by-country.csv")
+world.pop <- read.csv("./data/population-by-country.csv")
+world.pop.data <- merge(x = world.prison.pop, y = world.pop, by = "Country")
+
+labeled.countries = c("United States", "China", "Russia", "United Kingdom", "India")
+
+png("./reports/figures/total_population_vs_prison_population_by_country.png")
+p6 <- ggplot(world.pop.data,
+       aes(x = Population, y = Prison.Population, group = Country)) +
+  geom_point(data = world.pop.data) +
+  geom_label_repel(
+    data = subset(world.pop.data, Country %in% labeled.countries),
+    aes(x = Population, y = Prison.Population, label = Country),
+    color = "black",
+    fill = light.gray,
+    box.padding = unit(0.3, "cm"),
+    point.padding = unit(0.1, "cm"),
+    segment.color = 'grey50',
+    label.size = 0
+  ) +
+  xlab("Total Population") +
+  ylab("Prison Population") +
+  ggtitle("Total Population vs. Prison Population by Country")
+p6
+dev.off()
+
