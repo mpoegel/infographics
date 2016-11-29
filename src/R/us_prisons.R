@@ -1,5 +1,7 @@
+library(extrafont)
 library(ggplot2)
 library(ggrepel)
+library(grid)
 
 #
 # Load the compiled data
@@ -21,6 +23,10 @@ prison.data$total <- as.numeric(as.character(prison.data$total))
 #
 dark.gray  <- "#D2D2D3"
 light.gray <- "#F3F3F3"
+
+# Pallet: http://paletton.com/#uid=50q0u0kllllaFw0g0qFqFg0w0aF
+orange      <- "#AA6839"
+dark.orange <- "#804115"
 
 
 #
@@ -163,5 +169,43 @@ p6 <- ggplot(world.pop.data,
   ylab("Prison Population") +
   ggtitle("Total Population vs. Prison Population by Country")
 p6
+dev.off()
+
+
+
+#
+# Create the poster
+#
+vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+main.font <- "Bookman Old Style"
+
+
+pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40, fonts = "Segoe UI")
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(nrow=5, ncol=6)))
+grid.rect(gp = gpar(fill = light.gray, color = light.gray))
+
+# header
+grid.rect(gp = gpar(fill = orange, color = orange),
+          x = unit(0.5, "npc"), y = unit(0.95, "npc"),
+          width = unit(1, "npc"), height = unit(0.10, "npc"))
+grid.text("Monetizing Prisons",
+          x = unit(0.5, "npc"), y = unit(0.97, "npc"), 
+          gp = gpar(fontfamily = main.font, color = dark.gray, cex = 10))
+grid.text("HOW MONETIZING THE U.S. PRISON SYSTEM HAS AFFECTED SOCIETY",
+          x = unit(0.5, "npc"), y = unit(0.93, "npc"),
+          gp = gpar(fontfamily = main.font, color = light.gray, cex = 3))
+grid.text("Andrew Batbouta and Matt Poegel",
+          x = unit(0.5, "npc"), y = unit(0.91, "npc"),
+          gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
+
+# footer
+grid.rect(gp = gpar(fill = orange, color = orange),
+          x = unit(0.5, "npc"), y = unit(0, "npc"),
+          width = unit(1, "npc"), height = unit(0.1, "npc"))
+grid.text("American Politics in Crisis, Fall 2016",
+          x = unit(0.89, "npc"), y = unit(0.01, "npc"),
+          gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
+
 dev.off()
 
