@@ -21,27 +21,59 @@ prison.data$total <- as.numeric(as.character(prison.data$total))
 #
 # Color themes
 #
+black      <- "#000000"
 dark.gray  <- "#D2D2D3"
 light.gray <- "#F3F3F3"
 
 # Pallet: http://paletton.com/#uid=50q0u0kllllaFw0g0qFqFg0w0aF
 orange      <- "#AA6839"
 dark.orange <- "#804115"
+red         <- "#A43741"
+
+main.font <- "Bookman Old Style"
+
+orangeLineTheme <- function() {
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = light.gray, color = light.gray),
+    panel.background = element_rect(fill = light.gray),
+    axis.text = element_text(color = dark.orange, family = main.font),
+    plot.title = element_text(color = dark.orange, face = "bold", size = 24, vjust = 1, 
+                              family = main.font),
+    axis.title = element_text(color = dark.orange, face = "bold", size = 18, family = main.font),
+    axis.title.x = element_text(margin = margin(0.5, 0, 0, 0, unit = "cm")),
+    axis.title.y = element_text(margin = margin(0, 0.5, 0, 0, unit = "cm")),
+    panel.grid.major.y = element_line(color = orange),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    strip.text = element_text(family = main.font, color = "white"),
+    strip.background = element_rect(fill = orange),
+    axis.ticks = element_line(color = orange)
+  )
+}
 
 
 #
 # Plot the U.S. Total Population of Private Prisons over time
 #
+percision <- 10000
+min.pop <- round(min(prison.data[prison.data$jurisdiction == "U.S. Total", ]$private)/ percision) *
+  percision
+max.pop <- round(max(prison.data[prison.data$jurisdiction == "U.S. Total", ]$private)/ percision) *
+  percision
+
 png("./reports/figures/total_us_private_prison_pop.png")
 p1 <- ggplot(prison.data[prison.data$jurisdiction == "U.S. Total", ], 
              aes(x = year, y = private, group = jurisdiction)) +
-  geom_line(stat="identity", aes(color=jurisdiction)) +
+  geom_line(stat="identity", color=red, size=1.5) +
+  scale_x_continuous(breaks=c(seq(2000, 2014, 2))) +
+  scale_y_continuous(breaks=c(seq(min.pop, max.pop + percision, percision))) +
+  expand_limits(x = 2000, y = max.pop) +
   xlab("Year") +
   ylab("Population of Private Prisons") +
-  ggtitle("U.S. Total Population of Private Prisons from 2000-2014") +
-  theme(
-    legend.position = "none"
-  )
+  ggtitle("Rapid Growth in Total Population of Private Prisons\nfrom 2000-2014") +
+  orangeLineTheme()
 p1
 dev.off()
 
@@ -177,10 +209,9 @@ dev.off()
 # Create the poster
 #
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
-main.font <- "Bookman Old Style"
 
 
-pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40, fonts = "Segoe UI")
+pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40, fonts = main.font)
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(nrow=5, ncol=6)))
 grid.rect(gp = gpar(fill = light.gray, color = light.gray))
@@ -198,6 +229,27 @@ grid.text("HOW MONETIZING THE U.S. PRISON SYSTEM HAS AFFECTED SOCIETY",
 grid.text("Andrew Batbouta and Matt Poegel",
           x = unit(0.5, "npc"), y = unit(0.91, "npc"),
           gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
+
+header.gpar <- gpar(fontfamily = main.font, color = light.gray, cex = 4)
+paragraph.gpar <- gpar(fontfamily = main.font, color = light.gray, cex = 2)
+
+# first column
+grid.text("Prisons for Profit", x = unit(0.12, "npc"), y = unit(0.88, "npc"), gp = header.gpar)
+grid.text("Bacon ipsum dolor amet venison t-bone picanha meatball
+shankle, swine pork. Frankfurter filet mignon picanha venison
+shankle turkey pork loin. Tongue beef flank biltong, sausage
+brisket cow capicola. Kevin sirloin meatball, spare ribs cow
+cupim alcatra biltong pastrami.",
+          x = unit(0.03, "npc"), y = unit(0.84, "npc"), gp = paragraph.gpar, just = "left")
+
+print(p1 + theme(plot.margin=margin(1, 0, 0, 2, unit="cm")),
+      vp = vplayout(2, 1:2))
+
+# second column
+
+
+# third column
+
 
 # footer
 grid.rect(gp = gpar(fill = orange, color = orange),
