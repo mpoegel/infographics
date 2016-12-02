@@ -2,6 +2,9 @@ library(extrafont)
 library(ggplot2)
 library(ggrepel)
 library(grid)
+library(maps)
+library(mapdata)
+library(ggmap)
 
 #
 # Load the compiled data
@@ -50,6 +53,15 @@ orangeLineTheme <- function() {
     strip.text = element_text(family = main.font, color = "white"),
     strip.background = element_rect(fill = orange),
     axis.ticks = element_line(color = orange)
+  )
+}
+
+mapTheme <- function() {
+  theme(
+    panel.background = element_rect(fill = "transparent", color = "transparent"),
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
   )
 }
 
@@ -204,10 +216,28 @@ p6
 dev.off()
 
 
+#
+# Map incidents across the 50 states
+#
+
+troy <- geocode("Troy, NY")
+troy$label = c("Troy")
+
+state.map.data <- map_data("state")
+
+p7 <- ggplot() +
+  geom_map(data = state.map.data, map = state.map.data,
+           aes(x=long, y=lat, map_id=region), fill = light.gray, color = dark.gray) +
+  geom_label_repel(data = troy, aes(x = lon, y = lat, label = label),
+                   box.padding = unit(1, "cm")) +
+  mapTheme()
+p7
+
 
 #
 # Create the poster
 #
+
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 
 
@@ -252,6 +282,12 @@ print(p1 + theme(plot.margin=margin(1, 0, 0, 2, unit="cm")),
 
 
 # footer
+grid.text("\"It's a fact that needs to be spoken: America's prisons are broken!\"",
+          x = unit(0.5, "npc"), y = unit(0.08, "npc"),
+          gp = gpar(fontfamily = main.font, fontface = "italic", color = light.gray, cex = 3.5))
+grid.text("- John Oliver",
+          x = unit(0.5, "npc"), y = unit(0.06, "npc"),
+          gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
 grid.rect(gp = gpar(fill = orange, color = orange),
           x = unit(0.5, "npc"), y = unit(0, "npc"),
           width = unit(1, "npc"), height = unit(0.1, "npc"))
