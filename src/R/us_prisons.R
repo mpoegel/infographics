@@ -5,6 +5,7 @@ library(grid)
 library(maps)
 library(mapdata)
 library(ggmap)
+library(waffle)
 
 #
 # Load the compiled data
@@ -62,6 +63,17 @@ mapTheme <- function() {
     axis.title = element_blank(),
     axis.ticks = element_blank(),
     axis.text = element_blank()
+  )
+}
+
+waffleTheme <- function() {
+  theme(
+    legend.position = "none",
+    plot.title = element_text(color = dark.orange, face = "bold", size = 24, vjust = 1, 
+                              family = main.font),
+    axis.title = element_text(color = dark.orange, face = "bold", size = 18, family = main.font),
+    strip.text = element_text(family = main.font, color = "white"),
+    strip.background = element_rect(fill = orange)
   )
 }
 
@@ -235,13 +247,32 @@ p7
 
 
 #
+# Graph 34,000 beds
+#
+
+p8 <- waffle(c(340), rows = 10, size = 0, use_glyph = "bed", glyph_size = 4,
+             legend_pos = "none", color = red,
+             title ="Congress Forces ICE to Maintain 34,000\nPrison Cells for Immigration",
+             xlab = "1 Bed = 100 ICE Beds") +
+  waffleTheme()
+p8
+
+#
+# Create a plot using just the musical note on a waffle plot (yes, a hack)
+#
+
+musical.note <- waffle(c(1), rows = 1, size = 0, use_glyph = "music", glyph_size = 16,
+                       legend_pos = "none", color = black)
+musical.note
+
+#
 # Create the poster
 #
 
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 
 
-pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40, fonts = main.font)
+cairo_pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40)
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(nrow=5, ncol=6)))
 grid.rect(gp = gpar(fill = light.gray, color = light.gray))
@@ -288,6 +319,11 @@ grid.text("\"It's a fact that needs to be spoken: America's prisons are broken!\
 grid.text("- John Oliver",
           x = unit(0.5, "npc"), y = unit(0.06, "npc"),
           gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
+print(musical.note + theme(plot.margin=margin(3, -7, -1, 7, unit="cm")), 
+      vp = vplayout(5, 1))
+print(musical.note + theme(plot.margin=margin(3, 7, -1, -7, unit="cm")), 
+      vp = vplayout(5, 6))
+
 grid.rect(gp = gpar(fill = orange, color = orange),
           x = unit(0.5, "npc"), y = unit(0, "npc"),
           width = unit(1, "npc"), height = unit(0.1, "npc"))
@@ -296,4 +332,5 @@ grid.text("American Politics in Crisis, Fall 2016",
           gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
 
 dev.off()
+
 
