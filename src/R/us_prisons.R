@@ -26,6 +26,7 @@ prison.data$total <- as.numeric(as.character(prison.data$total))
 # Color themes
 #
 black      <- "#000000"
+off.black  <- "#121212"
 dark.gray  <- "#D2D2D3"
 light.gray <- "#F3F3F3"
 
@@ -33,6 +34,7 @@ light.gray <- "#F3F3F3"
 orange      <- "#AA6839"
 dark.orange <- "#804115"
 red         <- "#A43741"
+dark.red    <- "#520008"
 
 main.font <- "Bookman Old Style"
 
@@ -60,9 +62,14 @@ orangeLineTheme <- function() {
 mapTheme <- function() {
   theme(
     panel.background = element_rect(fill = "transparent", color = "transparent"),
+    plot.background =  element_rect(fill = "transparent", color = "transparent"),
     axis.title = element_blank(),
     axis.ticks = element_blank(),
-    axis.text = element_blank()
+    axis.text = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
   )
 }
 
@@ -135,9 +142,9 @@ p3 <- ggplot(state.prison.data,
              aes(x = year, y = private, group = jurisdiction)) +
   geom_line(stat = "identity", color = dark.gray) +
   geom_line(stat = "identity", data = subset(state.prison.data, jurisdiction == "Texas"),
-            color = "red") +
+            color = dark.red) +
   geom_line(stat = "identity", data = subset(state.prison.data, jurisdiction == "Florida"),
-            color = "blue") +
+            color = dark.red) +
   geom_label_repel(
     data = subset(state.prison.data, jurisdiction %in% labeled.states & year == 2014),
     aes(2014, private, label = jurisdiction),
@@ -148,9 +155,13 @@ p3 <- ggplot(state.prison.data,
     segment.color = 'grey50',
     label.size = 0
   ) +
+  scale_x_continuous(breaks=c(seq(2000, 2014, 2))) +
+  # scale_y_continuous(breaks=c(seq(min.pop, max.pop + percision, percision))) +
+  # expand_limits(x = 2000, y = max.pop) +
   xlab("Year") +
   ylab("Population in Private Prisons") +
-  ggtitle("Population in Private Prisons by State (2000-2014)") +
+  ggtitle("Texas and Florida Have Highest Populations\nin Private Prisons (2000-2014)") +
+  orangeLineTheme() +
   theme(
     legend.position = "none"
   )
@@ -297,14 +308,17 @@ grid.text("Andrew Batbouta and Matt Poegel",
           x = unit(0.5, "npc"), y = unit(0.91, "npc"),
           gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
 
-header.gpar <- gpar(fontfamily = main.font, color = light.gray, cex = 4)
-paragraph.gpar <- gpar(fontfamily = main.font, color = light.gray, cex = 2)
+header.gpar <- gpar(fontfamily = main.font, col = off.black, cex = 4)
+paragraph.gpar <- gpar(fontfamily = main.font, col = off.black, cex = 2)
+splash.gpar <- gpar(fontfamily = main.font, col = dark.orange, cex = 9)
 
 # first column
 grid.text("Prisons for Profit", x = unit(0.12, "npc"), y = unit(0.88, "npc"), gp = header.gpar)
 
-print(p1 + theme(plot.margin=margin(2.5, 0, -2.5, 3, unit="cm")),
+print(p1 + theme(plot.margin=margin(2.5, -1, -2.5, 3.5, unit="cm")),
       vp = vplayout(3, 1:2))
+print(p7 + theme(plot.margin=margin(0, 0, 0, 3, unit="cm")),
+      vp = vplayout(7, 1:2))
 
 pp.intro <- c(
   "There are 2.2 Million people in prisons in the US.",
@@ -322,9 +336,32 @@ grid.text("Cruel and Inhumane", x = unit(0.02, "npc"), y = unit(0.58, "npc"), gp
 
 # second column
 
+print(p3 + theme(plot.margin=margin(-6, 0, 4, 4, unit="cm")),
+      vp = vplayout(5, 3:4))
+
 grid.text("High Recidivism", x = unit(0.38, "npc"), y = unit(0.88, "npc"), gp = header.gpar,
           just = "left")
+pp.high.recid1 <- c(
+  "There is a lack of reason to rehabilitate prisoners, because companies can make profits instead",
+  "Labor includes making Licence plates to office furniture to staffing call centers, run by UNICOR, a government run corporation",
+  "Inmates get paid in a range from $0.23 to $1.15 an hour working in prisons. Prisoners do not get health insurance or benefits."
+)
+grid.text(bulletize(pp.high.recid1, 55),
+          x = unit(0.38, "npc"), y = unit(0.815, "npc"), gp = paragraph.gpar, just = "left")
 
+grid.text("$2.4 Billion", x = unit(0.53, "npc"), y = unit(0.73, "npc"),
+          gp = splash.gpar)
+grid.text("the amount of money prison labor generates each year", x = unit(0.535, "npc"), 
+          y = unit(0.705, "npc"), gp = paragraph.gpar, just = "center")
+
+pp.high.recid2 <- c(
+  "Private prisons do not reward good behaviour often because it would lose inmates, which are the source of profits.",
+  "Prisoners often lack resources found at state or Federal prisons",
+  "To increase profits, private prisons cut back on spending related to improving prisoner conditions",
+  "These prisons often employ less guards to save money, which leads to more violence"
+)
+grid.text(bulletize(pp.high.recid2, 55),
+          x = unit(0.38, "npc"), y = unit(0.62, "npc"), gp = paragraph.gpar, just = "left")
 
 grid.text("Prison is Punishment", x = unit(0.38, "npc"), y = unit(0.40, "npc"),
           gp = header.gpar, just = "left")
@@ -333,7 +370,7 @@ grid.text("Prison is Punishment", x = unit(0.38, "npc"), y = unit(0.40, "npc"),
 
 # third column
 
-grid.text("The Solutions", x = unit(0.70, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
+grid.text("The Solutions", x = unit(0.72, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
           just = "left")
 
 
@@ -343,17 +380,17 @@ grid.text(paste(intToUtf8(0x0266B),
                 "\"It's a fact that needs to be spoken: America's prisons are broken!\"",
                 intToUtf8(0x0266B)),
           x = unit(0.5, "npc"), y = unit(0.08, "npc"),
-          gp = gpar(fontfamily = main.font, fontface = "italic", color = light.gray, cex = 3.5))
+          gp = gpar(fontfamily = main.font, fontface = "italic", col = off.black, cex = 3.5))
 grid.text("- John Oliver",
           x = unit(0.5, "npc"), y = unit(0.06, "npc"),
-          gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 2))
 
 grid.rect(gp = gpar(fill = orange, color = orange),
           x = unit(0.5, "npc"), y = unit(0, "npc"),
           width = unit(1, "npc"), height = unit(0.1, "npc"))
 grid.text("American Politics in Crisis, Fall 2016",
           x = unit(0.89, "npc"), y = unit(0.01, "npc"),
-          gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 2))
 
 dev.off()
 
