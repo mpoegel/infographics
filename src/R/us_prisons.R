@@ -77,6 +77,15 @@ waffleTheme <- function() {
   )
 }
 
+bullet <- intToUtf8(0x2022)
+bulletize <- function(lis, width) {
+  res <- ""
+  for (text in lis) {
+    res <- paste(res, bullet, paste(strwrap(text, width=width), collapse = "\n    "), "\n")
+  }
+  res
+}
+
 
 #
 # Plot the U.S. Total Population of Private Prisons over time
@@ -229,19 +238,16 @@ dev.off()
 
 
 #
-# Map incidents across the 50 states
+# Map cruel and inhuame incidents in private prisons across the country
 #
 
-troy <- geocode("Troy, NY")
-troy$label = c("Troy")
-
 state.map.data <- map_data("state")
+incidents.data <- read.csv('./data/cruel_and_inhumane_incidents.csv')
 
 p7 <- ggplot() +
   geom_map(data = state.map.data, map = state.map.data,
            aes(x=long, y=lat, map_id=region), fill = light.gray, color = dark.gray) +
-  geom_label_repel(data = troy, aes(x = lon, y = lat, label = label),
-                   box.padding = unit(1, "cm")) +
+  geom_label(data = incidents.data, aes(x = lon, y = lat, label = id), size=2) +
   mapTheme()
 p7
 
@@ -274,7 +280,7 @@ vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 
 cairo_pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40)
 grid.newpage()
-pushViewport(viewport(layout = grid.layout(nrow=5, ncol=6)))
+pushViewport(viewport(layout = grid.layout(nrow=8, ncol=6)))
 grid.rect(gp = gpar(fill = light.gray, color = light.gray))
 
 # header
@@ -296,33 +302,51 @@ paragraph.gpar <- gpar(fontfamily = main.font, color = light.gray, cex = 2)
 
 # first column
 grid.text("Prisons for Profit", x = unit(0.12, "npc"), y = unit(0.88, "npc"), gp = header.gpar)
-grid.text("Bacon ipsum dolor amet venison t-bone picanha meatball
-shankle, swine pork. Frankfurter filet mignon picanha venison
-shankle turkey pork loin. Tongue beef flank biltong, sausage
-brisket cow capicola. Kevin sirloin meatball, spare ribs cow
-cupim alcatra biltong pastrami.",
-          x = unit(0.03, "npc"), y = unit(0.84, "npc"), gp = paragraph.gpar, just = "left")
 
-print(p1 + theme(plot.margin=margin(1, 0, 0, 2, unit="cm")),
-      vp = vplayout(2, 1:2))
+print(p1 + theme(plot.margin=margin(2.5, 0, -2.5, 3, unit="cm")),
+      vp = vplayout(3, 1:2))
+
+pp.intro <- c(
+  "There are 2.2 Million people in prisons in the US.",
+  "We have the most in the world, 600K more than China a country that has 1 billion more citizens than the US.",
+  "Why do we have so many? We don't take care of our prisoners, 77% recidivism in State prisons, 44% in federal. Norway has 20% recidivism.",
+  "We punish rather than rehabilitate.",
+  "Private Prisons bring out the worst in prisons by having no motivations to help prisoners and rather and can make money by not rewarding good behavior and having high recidivism."
+)
+
+grid.text(bulletize(pp.intro, 55),
+          x = unit(0.03, "npc"), y = unit(0.795, "npc"), gp = paragraph.gpar, just = "left")
+
+grid.text("Cruel and Inhumane", x = unit(0.02, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
+          just = "left")
 
 # second column
+
+grid.text("High Recidivism", x = unit(0.38, "npc"), y = unit(0.88, "npc"), gp = header.gpar,
+          just = "left")
+
+
+grid.text("Prison is Punishment", x = unit(0.38, "npc"), y = unit(0.40, "npc"),
+          gp = header.gpar, just = "left")
+
 
 
 # third column
 
+grid.text("The Solutions", x = unit(0.70, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
+          just = "left")
+
+
 
 # footer
-grid.text("\"It's a fact that needs to be spoken: America's prisons are broken!\"",
+grid.text(paste(intToUtf8(0x0266B),
+                "\"It's a fact that needs to be spoken: America's prisons are broken!\"",
+                intToUtf8(0x0266B)),
           x = unit(0.5, "npc"), y = unit(0.08, "npc"),
           gp = gpar(fontfamily = main.font, fontface = "italic", color = light.gray, cex = 3.5))
 grid.text("- John Oliver",
           x = unit(0.5, "npc"), y = unit(0.06, "npc"),
           gp = gpar(fontfamily = main.font, color = light.gray, cex = 2))
-print(musical.note + theme(plot.margin=margin(3, -7, -1, 7, unit="cm")), 
-      vp = vplayout(5, 1))
-print(musical.note + theme(plot.margin=margin(3, 7, -1, -7, unit="cm")), 
-      vp = vplayout(5, 6))
 
 grid.rect(gp = gpar(fill = orange, color = orange),
           x = unit(0.5, "npc"), y = unit(0, "npc"),
