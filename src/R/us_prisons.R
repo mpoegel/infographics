@@ -2,6 +2,7 @@ library(extrafont)
 library(ggplot2)
 library(ggrepel)
 library(grid)
+library(jpeg)
 library(maps)
 library(mapdata)
 library(ggmap)
@@ -223,6 +224,7 @@ dev.off()
 #
 
 world.prison.pop <- read.csv("./data/prison-population-by-country.csv")
+world.prison.pop$Prison.Population <- world.prison.pop$Prison.Population / 100000
 world.pop <- read.csv("./data/population-by-country.csv")
 world.pop.data <- merge(x = world.prison.pop, y = world.pop, by = "Country")
 
@@ -231,20 +233,30 @@ labeled.countries = c("United States", "China", "Russia", "United Kingdom", "Ind
 png("./reports/figures/total_population_vs_prison_population_by_country.png")
 p6 <- ggplot(world.pop.data,
        aes(x = Population, y = Prison.Population, group = Country)) +
-  geom_point(data = world.pop.data) +
+  geom_point(data = world.pop.data, color = dark.gray) +
   geom_label_repel(
     data = subset(world.pop.data, Country %in% labeled.countries),
     aes(x = Population, y = Prison.Population, label = Country),
-    color = "black",
-    fill = light.gray,
-    box.padding = unit(0.3, "cm"),
+    color = dark.gray,
+    fill = white,
+    box.padding = unit(0.15, "cm"),
     point.padding = unit(0.1, "cm"),
     segment.color = 'grey50',
-    label.size = 0
+    label.size = 0,
+    size = 3
   ) +
-  xlab("Total Population") +
-  ylab("Prison Population") +
-  ggtitle("Total Population vs. Prison Population by Country")
+  theme(
+    panel.background = element_rect(fill = "transparent", color = "transparent"),
+    plot.background =  element_rect(fill = "transparent", color = "transparent"),
+    axis.title = element_blank(),
+    # axis.ticks = element_blank(),
+    # axis.text = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.margin.y = unit(0, "cm")
+  )
 p6
 dev.off()
 
@@ -259,7 +271,7 @@ incidents.locs <- read.csv("./data/cruel_and_inhumane_incidents_locs.csv")
 
 p7 <- ggplot() +
   geom_map(data = state.map.data, map = state.map.data,
-           aes(x=long, y=lat, map_id=region), fill = light.gray, color = dark.gray) +
+           aes(x=long, y=lat, map_id=region), fill = dark.gray, color = off.black) +
   geom_point(data = incidents.locs, aes(x = lon, y = lat), size = 9, color = orange) +
   geom_text(data = incidents.locs, aes(x = lon, y = lat, label = id), color = white,
             fontface = "bold", vjust = 0.35, hjust = 0.40) +
@@ -284,12 +296,16 @@ p8
 #
 
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+prison.compare.img <- readJPEG("./data/norway-vs-alcatraz.jpg")
 
 
 cairo_pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40, family = "Arial Unicode MS")
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(nrow=8, ncol=6)))
 grid.rect(gp = gpar(fill = light.gray, color = light.gray))
+
+print(p6 + theme(plot.margin=margin(7, 0.5, 6, 0.5, unit="cm")),
+      vp = vplayout(1:8,1:6))
 
 # header
 grid.rect(gp = gpar(fill = orange, color = orange),
@@ -341,14 +357,14 @@ for (d in levels(incidents.data$description)) {
   i <- i + max(0, length(lines) / 4)
   k <- 0
   while (k < length(ss$id)) {
-    grid.circle(x = 0.03 + (k * 0.015), y = 0.56 - (i * 0.03), r = 0.007,
+    grid.circle(x = 0.03 + (k * 0.015), y = 0.57 - (i * 0.03), r = 0.007,
                 gp = gpar(col = orange, fill = orange))
-    grid.text(ss$id[k + 1], x = 0.03 + (k * 0.015), y = 0.56 - (i * 0.03),
+    grid.text(ss$id[k + 1], x = 0.03 + (k * 0.015), y = 0.57 - (i * 0.03),
               gp = gpar(col = white, cex = 1.5))
     k <- k + 1
   }
   grid.text(paste(lines, collapse = "\n"), 
-            x = 0.03 + (k * 0.015), y = 0.56 - (i * 0.03), gp = paragraph.gpar, just = "left")
+            x = 0.03 + (k * 0.015), y = 0.57 - (i * 0.03), gp = paragraph.gpar, just = "left")
   i <- i + max(0.5, length(lines) / 4)
 }
 
@@ -385,8 +401,36 @@ grid.text("Prison is Punishment", x = unit(0.38, "npc"), y = unit(0.40, "npc"),
 
 # third column
 
-grid.text("The Solutions", x = unit(0.72, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
+grid.text("The Solutions", x = unit(0.70, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
           just = "left")
+pp.solutions.1 <- c(
+  "Improve living conditions to make inmates feel more like people.",
+  "Restore voting rights, should be able to act as citizens if they will be citizens after finishing sentence."
+)
+grid.text("Treat Prisoners Like People", x = unit(0.705, "npc"), y = unit(0.56, "npc"),
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"), just = "left")
+grid.text(bulletize(pp.solutions.1, 50),
+          x = unit(0.70, "npc"), y = unit(0.52, "npc"), gp = paragraph.gpar, just = "left")
+pp.solutions.2 <- c(
+  "Non violent crimes, drug offenses should not result in serious jail time.",
+  "Those not yet convicted of their crime should not be in jail, many pretrial detainees who, in some cases, had spent years detained in county jails awaiting trial.",
+  "Improve free legal aid so that people aren't forced to make a deal instead of a fair trial."
+)
+grid.text("Keep Less People in Prison", x = unit(0.70, "npc"), y = unit(0.48, "npc"),
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"), just = "left")
+grid.text(bulletize(pp.solutions.2, 50),
+          x = unit(0.70, "npc"), y = unit(0.42, "npc"), gp = paragraph.gpar, just = "left")
+pp.solutions.3 <- c(
+  "Spend less money on prisons and re-invest in health care programs for those with mental health or drug addiction programs.",
+  "Have more programs to provide job training, english lessons, parenting, and drug abuse before prisoners will receive these programs in jail."
+)
+grid.text("Spend More on Health and Welfare Programs", x = unit(0.70, "npc"), y = unit(0.36, "npc"),
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"), just = "left")
+grid.text(bulletize(pp.solutions.3, 50),
+          x = unit(0.70, "npc"), y = unit(0.31, "npc"), gp = paragraph.gpar, just = "left")
+
+
+grid.raster(prison.compare.img, x = unit(0.85, "npc"), y = unit(0.18, "npc"), width = unit(0.27, "npc"))
 
 
 
