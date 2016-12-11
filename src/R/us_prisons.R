@@ -29,6 +29,7 @@ black      <- "#000000"
 off.black  <- "#121212"
 dark.gray  <- "#D2D2D3"
 light.gray <- "#F3F3F3"
+white      <- "#FFFFFF"
 
 # Pallet: http://paletton.com/#uid=50q0u0kllllaFw0g0qFqFg0w0aF
 orange      <- "#AA6839"
@@ -142,9 +143,9 @@ p3 <- ggplot(state.prison.data,
              aes(x = year, y = private, group = jurisdiction)) +
   geom_line(stat = "identity", color = dark.gray) +
   geom_line(stat = "identity", data = subset(state.prison.data, jurisdiction == "Texas"),
-            color = dark.red) +
+            color = red, size = 1) +
   geom_line(stat = "identity", data = subset(state.prison.data, jurisdiction == "Florida"),
-            color = dark.red) +
+            color = red, size = 1) +
   geom_label_repel(
     data = subset(state.prison.data, jurisdiction %in% labeled.states & year == 2014),
     aes(2014, private, label = jurisdiction),
@@ -253,12 +254,15 @@ dev.off()
 #
 
 state.map.data <- map_data("state")
-incidents.data <- read.csv('./data/cruel_and_inhumane_incidents.csv')
+incidents.data <- read.csv("./data/cruel_and_inhumane_incidents.csv")
+incidents.locs <- read.csv("./data/cruel_and_inhumane_incidents_locs.csv")
 
 p7 <- ggplot() +
   geom_map(data = state.map.data, map = state.map.data,
            aes(x=long, y=lat, map_id=region), fill = light.gray, color = dark.gray) +
-  geom_label(data = incidents.data, aes(x = lon, y = lat, label = id), size=2) +
+  geom_point(data = incidents.locs, aes(x = lon, y = lat), size = 9, color = orange) +
+  geom_text(data = incidents.locs, aes(x = lon, y = lat, label = id), color = white,
+            fontface = "bold", vjust = 0.35, hjust = 0.40) +
   mapTheme()
 p7
 
@@ -274,13 +278,6 @@ p8 <- waffle(c(340), rows = 10, size = 0, use_glyph = "bed", glyph_size = 4,
   waffleTheme()
 p8
 
-#
-# Create a plot using just the musical note on a waffle plot (yes, a hack)
-#
-
-musical.note <- waffle(c(1), rows = 1, size = 0, use_glyph = "music", glyph_size = 16,
-                       legend_pos = "none", color = black)
-musical.note
 
 #
 # Create the poster
@@ -289,7 +286,7 @@ musical.note
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 
 
-cairo_pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40)
+cairo_pdf("./reports/figures/private_prisons.pdf", width = 30, height = 40, family = "Arial Unicode MS")
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(nrow=8, ncol=6)))
 grid.rect(gp = gpar(fill = light.gray, color = light.gray))
@@ -312,13 +309,16 @@ header.gpar <- gpar(fontfamily = main.font, col = off.black, cex = 4)
 paragraph.gpar <- gpar(fontfamily = main.font, col = off.black, cex = 2)
 splash.gpar <- gpar(fontfamily = main.font, col = dark.orange, cex = 9)
 
-# first column
-grid.text("Prisons for Profit", x = unit(0.12, "npc"), y = unit(0.88, "npc"), gp = header.gpar)
 
 print(p1 + theme(plot.margin=margin(2.5, -1, -2.5, 3.5, unit="cm")),
       vp = vplayout(3, 1:2))
-print(p7 + theme(plot.margin=margin(0, 0, 0, 3, unit="cm")),
+print(p7 + theme(plot.margin=margin(1, 0, 0, 3, unit="cm")),
       vp = vplayout(7, 1:2))
+print(p3 + theme(plot.margin=margin(-6, 0, 4, 4, unit="cm")),
+      vp = vplayout(5, 3:4))
+
+# first column
+grid.text("Prisons for Profit", x = unit(0.12, "npc"), y = unit(0.88, "npc"), gp = header.gpar)
 
 pp.intro <- c(
   "There are 2.2 Million people in prisons in the US.",
@@ -334,10 +334,25 @@ grid.text(bulletize(pp.intro, 55),
 grid.text("Cruel and Inhumane", x = unit(0.02, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
           just = "left")
 
-# second column
+i <- 0
+for (d in levels(incidents.data$description)) {
+  ss <- incidents.data[ incidents.data$description == d, ]
+  lines <- strwrap(ss$description[1], width = 60 - (length(ss$id) * 3))
+  i <- i + max(0, length(lines) / 4)
+  k <- 0
+  while (k < length(ss$id)) {
+    grid.circle(x = 0.03 + (k * 0.015), y = 0.56 - (i * 0.03), r = 0.007,
+                gp = gpar(col = orange, fill = orange))
+    grid.text(ss$id[k + 1], x = 0.03 + (k * 0.015), y = 0.56 - (i * 0.03),
+              gp = gpar(col = white, cex = 1.5))
+    k <- k + 1
+  }
+  grid.text(paste(lines, collapse = "\n"), 
+            x = 0.03 + (k * 0.015), y = 0.56 - (i * 0.03), gp = paragraph.gpar, just = "left")
+  i <- i + max(0.5, length(lines) / 4)
+}
 
-print(p3 + theme(plot.margin=margin(-6, 0, 4, 4, unit="cm")),
-      vp = vplayout(5, 3:4))
+# second column
 
 grid.text("High Recidivism", x = unit(0.38, "npc"), y = unit(0.88, "npc"), gp = header.gpar,
           just = "left")
