@@ -228,7 +228,7 @@ world.prison.pop$Prison.Population <- world.prison.pop$Prison.Population / 10000
 world.pop <- read.csv("./data/population-by-country.csv")
 world.pop.data <- merge(x = world.prison.pop, y = world.pop, by = "Country")
 
-labeled.countries = c("United States", "China", "Russia", "United Kingdom", "India")
+labeled.countries = c("United States", "China", "Russia", "United Kingdom", "India", "Norway")
 
 png("./reports/figures/total_population_vs_prison_population_by_country.png")
 p6 <- ggplot(world.pop.data,
@@ -249,8 +249,6 @@ p6 <- ggplot(world.pop.data,
     panel.background = element_rect(fill = "transparent", color = "transparent"),
     plot.background =  element_rect(fill = "transparent", color = "transparent"),
     axis.title = element_blank(),
-    # axis.ticks = element_blank(),
-    # axis.text = element_blank(),
     panel.grid.major.y = element_blank(),
     panel.grid.minor.y = element_blank(),
     panel.grid.major.x = element_blank(),
@@ -346,7 +344,7 @@ grid.text("Prisons for Profit", x = unit(0.12, "npc"), y = unit(0.88, "npc"), gp
 
 pp.intro <- c(
   "There are 2.2 Million people in prisons in the US.",
-  "We have the most in the world, 600K more than China a country that has 1 billion more citizens than the US.",
+  "We have the most in the world, 600K more than China, a country that has 1 billion more citizens than the US.",
   "Why do we have so many? We don't take care of our prisoners, 77% recidivism in State prisons, 44% in federal. Norway has 20% recidivism.",
   "We punish rather than rehabilitate.",
   "Private Prisons bring out the worst in prisons by having no motivations to help prisoners and rather and can make money by not rewarding good behavior and having high recidivism."
@@ -395,9 +393,9 @@ grid.text("the amount of money prison labor generates each year", x = unit(0.535
 
 pp.high.recid2 <- c(
   "Private prisons do not reward good behaviour often because it would lose inmates, which are the source of profits.",
-  "Prisoners often lack resources found at state or Federal prisons",
-  "To increase profits, private prisons cut back on spending related to improving prisoner conditions",
-  "These prisons often employ less guards to save money, which leads to more violence"
+  "Prisoners often lack resources found at state or Federal prisons.",
+  "To increase profits, private prisons cut back on spending related to improving prisoner conditions.",
+  "Private prisons often employ less guards to save money, which leads to more violence."
 )
 grid.text(bulletize(pp.high.recid2, 55),
           x = unit(0.38, "npc"), y = unit(0.62, "npc"), gp = paragraph.gpar, just = "left")
@@ -456,7 +454,7 @@ grid.text(bulletize(pp.solutions.1, 49),
           x = unit(0.70, "npc"), y = unit(0.52, "npc"), gp = paragraph.gpar, just = "left")
 pp.solutions.2 <- c(
   "Non violent crimes, drug offenses should not result in serious jail time.",
-  "Those not yet convicted of their crime should not be in jail, many pretrial detainees who, in some cases, had spent years detained in county jails awaiting trial.",
+  "Those accused of non-violent crimes and awaiting trail should not be in jail. In many cases, pretrial detainees have spent years detained in county jails awaiting trial.",
   "Improve free legal aid so that people aren't forced to make a deal instead of a fair trial."
 )
 grid.text("Keep Less People in Prison", x = unit(0.70, "npc"), y = unit(0.48, "npc"),
@@ -493,6 +491,30 @@ grid.rect(gp = gpar(fill = orange, color = orange),
 grid.text("American Politics in Crisis, Fall 2016",
           x = unit(0.89, "npc"), y = unit(0.01, "npc"),
           gp = gpar(fontfamily = main.font, col = off.black, cex = 2))
+
+# References
+refs <- c(
+  "http://www.justicepolicy.org/uploads/justicepolicy/documents/florida-reform-not-privatization-fact-sheet-updated.pdf",
+  "https://storage.googleapis.com/vera-web-assets/downloads/Publications/the-price-of-prisons-what-incarceration-costs-taxpayers/legacy_downloads/price-of-prisons-updated-version-021914.pdf",
+  "https://www.inthepublicinterest.org/wp-content/uploads/ITPI-Recidivism-ResearchBrief-June2016.pdf",
+  "http://www.aljazeera.com/indepth/opinion/2016/11/stop-private-prisons-161126142726748.html",
+  "http://www.ohchr.org/EN/NewsEvents/Pages/DisplayNews.aspx?NewsID=20746&LangID=E",
+  "https://www.acluga.org/en/news/Worsened-Conditions-at-Stewart-Led-to-Hunger-Strike-Last-Week",
+  "http://www.detentionwatchnetwork.org/sites/default/files/reports/DWN%20Expose%20and%20Close%20Executive%20Summary.pdf",
+  "http://money.cnn.com/2012/08/14/smallbusiness/federal-prison-business/",
+  "http://www.pewtrusts.org/~/media/assets/2012/03/30/pew_nationalsurveyresearchpaper_final.pdf",
+  "http://www.bjs.gov/index.cfm?ty=pbse&sid=40 ",
+  "http://www.prisonstudies.org/",
+  "https://www.census.gov/population/international/data/idb/region.php?N=%20Results%20&T=6&A=separate&RT=0&Y=2016&R=1&C=AO"
+)
+
+grid.text(paste(refs[1:5], collapse = "\n"),
+          x = unit(0.40, "npc"), y = unit(0.03, "npc"),
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 1), just = "left")
+grid.text(paste(refs[6:12], collapse = "\n"),
+          x = unit(0.01, "npc"), y = unit(0.025, "npc"),
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 1), just = "left")
+
 
 dev.off()
 
