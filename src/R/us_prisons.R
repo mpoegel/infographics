@@ -292,6 +292,14 @@ p8
 
 
 #
+# Hack for a quotation mark
+#
+p9 <- waffle(c(1), rows = 1, size = 0, use_glyph = "quote-left", glyph_size = 35,
+             legend_pos = "none", color = dark.gray)
+p9
+
+
+#
 # Create the poster
 #
 
@@ -397,9 +405,44 @@ grid.text(bulletize(pp.high.recid2, 55),
 grid.text("Prison is Punishment", x = unit(0.38, "npc"), y = unit(0.40, "npc"),
           gp = header.gpar, just = "left")
 
+print(p9 + theme(plot.margin=margin(-5, 0, 5, 0, unit="cm")),
+      vp = vplayout(6, 3))
+punishment.quote <- "We are warehousing people, punishing them and returning them to our society worse off than when we got them. We are putting people in prison, many times, for non-violent crimes and turning them out more violent and dangerous than when they went in."
+grid.text(paste(strwrap(punishment.quote, 35), collapse = "\n"),
+          x = unit(0.53, "npc"), y = unit(0.31, "npc"),
+          gp = gpar(fontfamily = main.font, col = orange, cex = 3), just = "center")
+grid.text("- Vincent Schiraldi,\n founder and president of the Justice Policy Institute",
+          x = unit(0.53, "npc"), y = unit(0.22, "npc"),
+          gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"),
+          just = "center")
 
+grid.text("84", x = unit(0.44, "npc"), y = unit(0.15, "npc"),
+          gp = gpar(fontfamily = main.font, col = orange, cex = 18),
+          just = "center")
+punishment.percentage <- "percentage of Americans who believe that more money should be spent on community correction programs and less on locking up non-violent inmates"
+grid.text(paste(strwrap(punishment.percentage, 30), collapse = "\n"), x = unit(0.52, "npc"),
+          y = unit(0.15, "npc"), gp = paragraph.gpar, just = "left")
 
 # third column
+
+punishment.pp <- c(
+  "Prison phone companies and video call companies charge high rates, $0.25 per minute for phone and $20.00 for video, to talk to prisoners. Charging can limit availability to poor families.",
+  "Contact with families and communities has been shown to decrease recidivism.",
+  "Yet, the US would rather charge and allow companies to make money than to just let prisoners contact families and reduce their chances of going back to prison."
+)
+grid.text(bulletize(punishment.pp, 49),
+          x = unit(0.70, "npc"), y = unit(0.82, "npc"), gp = paragraph.gpar, just = "left")
+
+grid.text("90", x = unit(0.77, "npc"), y = unit(0.72, "npc"),
+          gp = gpar(fontfamily = main.font, col = orange, cex = 18),
+          just = "center")
+punishment.percentage <- "percentage of Americans who prioritize preventing recidivism over time served"
+grid.text(paste(strwrap(punishment.percentage, 27), collapse = "\n"), x = unit(0.84, "npc"),
+          y = unit(0.72, "npc"), gp = paragraph.gpar, just = "left")
+
+punishment.closing <- "The American people want justice system that takes criminals in and returns citizens to the world. The current system does not put in the effort and resources needed to provide a safe and humane environment for people to be rehabilitated and learn how to re-enter into society."
+grid.text(paste(strwrap(punishment.closing, 49), collapse = "\n"),
+          x = unit(0.71, "npc"), y = unit(0.64, "npc"), gp = paragraph.gpar, just = "left")
 
 grid.text("The Solutions", x = unit(0.70, "npc"), y = unit(0.58, "npc"), gp = header.gpar,
           just = "left")
@@ -409,7 +452,7 @@ pp.solutions.1 <- c(
 )
 grid.text("Treat Prisoners Like People", x = unit(0.705, "npc"), y = unit(0.56, "npc"),
           gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"), just = "left")
-grid.text(bulletize(pp.solutions.1, 50),
+grid.text(bulletize(pp.solutions.1, 49),
           x = unit(0.70, "npc"), y = unit(0.52, "npc"), gp = paragraph.gpar, just = "left")
 pp.solutions.2 <- c(
   "Non violent crimes, drug offenses should not result in serious jail time.",
@@ -418,15 +461,15 @@ pp.solutions.2 <- c(
 )
 grid.text("Keep Less People in Prison", x = unit(0.70, "npc"), y = unit(0.48, "npc"),
           gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"), just = "left")
-grid.text(bulletize(pp.solutions.2, 50),
+grid.text(bulletize(pp.solutions.2, 49),
           x = unit(0.70, "npc"), y = unit(0.42, "npc"), gp = paragraph.gpar, just = "left")
 pp.solutions.3 <- c(
   "Spend less money on prisons and re-invest in health care programs for those with mental health or drug addiction programs.",
   "Have more programs to provide job training, english lessons, parenting, and drug abuse before prisoners will receive these programs in jail."
 )
-grid.text("Spend More on Health and Welfare Programs", x = unit(0.70, "npc"), y = unit(0.36, "npc"),
+grid.text("Spend More on Health and Welfare Programs", x = unit(0.70, "npc"), y = unit(0.365, "npc"),
           gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"), just = "left")
-grid.text(bulletize(pp.solutions.3, 50),
+grid.text(bulletize(pp.solutions.3, 49),
           x = unit(0.70, "npc"), y = unit(0.31, "npc"), gp = paragraph.gpar, just = "left")
 
 
