@@ -347,7 +347,7 @@ pp.intro <- c(
   "We have the most in the world, 600K more than China, a country that has 1 billion more citizens than the US.",
   "Why do we have so many? We don't take care of our prisoners, 77% recidivism in State prisons, 44% in federal. Norway has 20% recidivism.",
   "We punish rather than rehabilitate.",
-  "Private Prisons bring out the worst in prisons by having no motivations to help prisoners and rather and can make money by not rewarding good behavior and having high recidivism."
+  "Private Prisons bring out the worst in prisons by having no motivations to help prisoners. Profits can be made by not rewarding good behavior and having high recidivism."
 )
 
 grid.text(bulletize(pp.intro, 55),
@@ -379,8 +379,8 @@ for (d in levels(incidents.data$description)) {
 grid.text("High Recidivism", x = unit(0.38, "npc"), y = unit(0.88, "npc"), gp = header.gpar,
           just = "left")
 pp.high.recid1 <- c(
-  "There is a lack of reason to rehabilitate prisoners, because companies can make profits instead",
-  "Labor includes making Licence plates to office furniture to staffing call centers, run by UNICOR, a government run corporation",
+  "There is a lack of reason to rehabilitate prisoners, because companies can make profits instead.",
+  "Labor includes making licence plates to office furniture to staffing call centers, run by UNICOR, a government run corporation.",
   "Inmates get paid in a range from $0.23 to $1.15 an hour working in prisons. Prisoners do not get health insurance or benefits."
 )
 grid.text(bulletize(pp.high.recid1, 55),
@@ -392,7 +392,7 @@ grid.text("the amount of money prison labor generates each year", x = unit(0.535
           y = unit(0.705, "npc"), gp = paragraph.gpar, just = "center")
 
 pp.high.recid2 <- c(
-  "Private prisons do not reward good behaviour often because it would lose inmates, which are the source of profits.",
+  "Private prisons do not reward good behaviour often because they would lose inmates, which are the source of revenue.",
   "Prisoners often lack resources found at state or Federal prisons.",
   "To increase profits, private prisons cut back on spending related to improving prisoner conditions.",
   "Private prisons often employ less guards to save money, which leads to more violence."
@@ -438,7 +438,7 @@ punishment.percentage <- "percentage of Americans who prioritize preventing reci
 grid.text(paste(strwrap(punishment.percentage, 27), collapse = "\n"), x = unit(0.84, "npc"),
           y = unit(0.72, "npc"), gp = paragraph.gpar, just = "left")
 
-punishment.closing <- "The American people want justice system that takes criminals in and returns citizens to the world. The current system does not put in the effort and resources needed to provide a safe and humane environment for people to be rehabilitated and learn how to re-enter into society."
+punishment.closing <- "The American people want a justice system that takes criminals in and returns citizens to the world. The current system does not put in the effort and resources needed to provide a safe and humane environment for people to be rehabilitated and learn how to re-enter into society."
 grid.text(paste(strwrap(punishment.closing, 49), collapse = "\n"),
           x = unit(0.71, "npc"), y = unit(0.64, "npc"), gp = paragraph.gpar, just = "left")
 
@@ -446,14 +446,14 @@ grid.text("The Solutions", x = unit(0.70, "npc"), y = unit(0.58, "npc"), gp = he
           just = "left")
 pp.solutions.1 <- c(
   "Improve living conditions to make inmates feel more like people.",
-  "Restore voting rights, should be able to act as citizens if they will be citizens after finishing sentence."
+  "Restore voting rights, should be able to act as citizens if they will be citizens after finishing a sentence."
 )
 grid.text("Treat Prisoners Like People", x = unit(0.705, "npc"), y = unit(0.56, "npc"),
           gp = gpar(fontfamily = main.font, col = off.black, cex = 2, fontface = "italic"), just = "left")
 grid.text(bulletize(pp.solutions.1, 49),
           x = unit(0.70, "npc"), y = unit(0.52, "npc"), gp = paragraph.gpar, just = "left")
 pp.solutions.2 <- c(
-  "Non violent crimes, drug offenses should not result in serious jail time.",
+  "Non violent crimes and drug offenses should not result in serious jail time.",
   "Those accused of non-violent crimes and awaiting trail should not be in jail. In many cases, pretrial detainees have spent years detained in county jails awaiting trial.",
   "Improve free legal aid so that people aren't forced to make a deal instead of a fair trial."
 )
