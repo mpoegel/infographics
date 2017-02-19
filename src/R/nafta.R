@@ -34,16 +34,20 @@ graph.theme <- function() {
 }
 
 # Add a line to a plot to show where NAFTA began
-mark.nafta.start <- function(plot, y) {
+mark.nafta.start <- function(plot) {
   plot + 
     # NAFTA took effect on Jan. 1, 1994
     geom_vline(xintercept = 1994, color = blue, linetype = 2) +
-    geom_text(aes(x = 1994, y = 22000, label = 'NAFTA'), hjust = -0.2, size = 4, color = blue)
+    geom_text(aes(x = 1994, y = NAFTA.label.y, label = 'NAFTA'), hjust = -0.2, size = 4, color = blue)
 }
 
 economic.data <- read.csv('data/WEOOct2016all.csv')
 nafta.countries <- c('United States', 'Canada', 'Mexico')
 nafta.data <- filter(economic.data, Country %in% nafta.countries)
+numeric.cols <- colnames(select(nafta.data, matches('\\d')))
+nafta.data[numeric.cols] <- lapply(nafta.data[numeric.cols], 
+                                   (function (x) as.numeric(as.character(gsub(',', '', x)))))
+
 
 # Let's start by plotting the GDP of these three countries
 gdp.data <- filter(nafta.data, WEO.Subject.Code == 'NGDPD') %>%
@@ -52,7 +56,7 @@ gdp.data <- filter(nafta.data, WEO.Subject.Code == 'NGDPD') %>%
   transmute(
     Country = Country,
     Year = as.numeric(gsub('X', '', variable)),
-    GDP = as.numeric(gsub(',', '', value)))
+    GDP = value)
 gdp.plot <- ggplot(gdp.data,
                    aes(x = Year, y = GDP, group = Country)) +
   geom_line(data = filter(gdp.data, Year <= 2015), stat = 'identity', aes(color = Country),
@@ -63,11 +67,128 @@ gdp.plot <- ggplot(gdp.data,
   ylab('GDP (Billions of U.S. Dollars)') +
   ggtitle('GDP of NAFTA Member Countries') +
   graph.theme()
-  
-gdp.plot <- mark.nafta.start(gdp.plot, 22000)
+
+NAFTA.label.y <- 22000
+gdp.plot <- mark.nafta.start(gdp.plot)
 gdp.plot
 
 # Save this plot
 png('reports/figures/nafta_countries_gdp.png')
 gdp.plot
 dev.off()
+
+# Maybe NAFTA has had an impact on growth?
+growth.data <- filter(nafta.data, WEO.Subject.Code == 'NGDP_RPCH') %>%
+  melt(id.vars = 'Country',
+       measure.vars = grep('\\d', names(nafta.data), value = TRUE)) %>%
+  transmute(
+    Country = Country,
+    Year = as.numeric(gsub('X', '', variable)),
+    Growth = value)
+growth.plot <- ggplot(growth.data,
+                      aes(x = Year, y = Growth, group = Country)) +
+  geom_line(data = filter(growth.data, Year <= 2015), stat = 'identity', aes(color = Country),
+            linetype = 1) +
+  geom_line(data = filter(growth.data, Year >= 2015), stat = 'identity', aes(color = Country),
+            linetype = 2) +
+  xlab('Year') +
+  ylab('Growth (Percent Change in GDP)') +
+  ggtitle('GDP Growth of NAFTA Member Countries') +
+  graph.theme()
+
+NAFTA.label.y <- 9
+growth.plot <- mark.nafta.start(growth.plot)
+growth.plot
+
+# Save this plot
+png('reports/figures/nafta_countries_gdp_growth.png')
+growth.plot
+dev.off()
+
+# Mexico's GDP growth tanks in '94! Is this a coincidence or the start of a trend? Lets calculate
+#   average growth before and after NAFTA was signed for each country
+growth.avgs <- nafta.data %>%
+  filter(WEO.Subject.Code == 'NGDP_RPCH')
+before.cols <- growth.avgs %>% select(matches('198[0-9]|199[0-3]'))
+after.cols  <- growth.avgs %>% select(matches('199[5-9]|200[0-9]|201[0-5]+'))
+growth.avgs <- growth.avgs %>%
+  transmute(
+    Country = Country,
+    '1980-1993' = rowSums(before.cols) / length(before.cols),
+    '1994-2015' = rowSums(after.cols) / length(after.cols)
+  ) %>%
+  melt(id.vars = 1)
+
+growth.avgs.plot <- ggplot(growth.avgs,
+                      aes(x = Country, y = value)) +
+  geom_bar(stat = 'identity', aes(fill = variable), position = 'dodge') +
+  labs(fill = 'Date Range') +
+  xlab('Country') +
+  ylab('Average Percentage Growth of GDP') +
+  ggtitle('Average GDP Growth Before and After NAFTA') +
+  graph.theme()
+growth.avgs.plot
+
+# Save this plot
+png('reports/figures/nafta_countries_gdp_growth_avgs.png')
+growth.avgs.plot
+dev.off()
+
+# Let's look at some statistics that effect the average person, starting with purchasing power
+#   parity
+ppp.data <- nafta.data %>%
+  filter(WEO.Subject.Code == 'PPPEX') %>%
+  melt(id.vars = 'Country',
+       measure.vars = grep('\\d', names(nafta.data), value = TRUE)) %>%
+  transmute(
+    Country = Country,
+    Year = as.numeric(gsub('X', '', variable)),
+    PPP = value)
+ppp.plot <- ggplot(ppp.data,
+                   aes(x = Year, y = PPP, group = Country)) +
+  geom_line(data = filter(ppp.data, Year <= 2015), stat = 'identity', aes(color = Country),
+            linetype = 1) +
+  geom_line(data = filter(ppp.data, Year >= 2015), stat = 'identity', aes(color = Country),
+            linetype = 2) +
+  xlab('Year') +
+  ylab('PPP Conversion Rate') +
+  ggtitle('PPP of NAFTA Member Countries') +
+  graph.theme()
+NAFTA.label.y <- 8.5
+ppp.plot <- mark.nafta.start(ppp.plot)
+ppp.plot
+
+# Save this plot
+png('reports/figures/nafta_countries_ppp.png')
+ppp.plot
+dev.off()
+
+# Unemployment rate is probably irrelevent but let's look at it anyway
+unemployment.data <- nafta.data %>%
+  filter(WEO.Subject.Code == 'LUR') %>%
+  melt(id.vars = 'Country',
+       measure.vars = grep('\\d', names(nafta.data), value = TRUE)) %>%
+  transmute(
+    Country = Country,
+    Year = as.numeric(gsub('X', '', variable)),
+    Unemployment = value)
+unemployment.plot <- ggplot(unemployment.data,
+                   aes(x = Year, y = Unemployment, group = Country)) +
+  geom_line(data = filter(unemployment.data, Year <= 2015), stat = 'identity', aes(color = Country),
+            linetype = 1) +
+  geom_line(data = filter(unemployment.data, Year >= 2015), stat = 'identity', aes(color = Country),
+            linetype = 2) +
+  xlab('Year') +
+  ylab('Unemployment Rate') +
+  ggtitle('Unemployment Rate of NAFTA Member Countries') +
+  graph.theme()
+NAFTA.label.y <- 12
+unemployment.plot <- mark.nafta.start(unemployment.plot)
+unemployment.plot
+
+# Save this plot
+png('reports/figures/nafta_countries_unemployment.png')
+unemployment.plot
+dev.off()
+
+
