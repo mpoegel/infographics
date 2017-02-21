@@ -41,6 +41,8 @@ mark.nafta.start <- function(plot) {
     geom_text(aes(x = 1994, y = NAFTA.label.y, label = 'NAFTA'), hjust = -0.2, size = 4, color = blue)
 }
 
+# Load data from the World Economic Outlook report by the International Monetary Fund from
+#   October 2016
 economic.data <- read.csv('data/WEOOct2016all.csv')
 nafta.countries <- c('United States', 'Canada', 'Mexico')
 nafta.data <- filter(economic.data, Country %in% nafta.countries)
@@ -134,8 +136,8 @@ png('reports/figures/nafta_countries_gdp_growth_avgs.png')
 growth.avgs.plot
 dev.off()
 
-# Let's look at some statistics that effect the average person, starting with purchasing power
-#   parity
+# Let's look at some statistics that have more effect on the average person, starting with
+#   purchasing power parity
 ppp.data <- nafta.data %>%
   filter(WEO.Subject.Code == 'PPPEX') %>%
   melt(id.vars = 'Country',
@@ -189,6 +191,121 @@ unemployment.plot
 # Save this plot
 png('reports/figures/nafta_countries_unemployment.png')
 unemployment.plot
+dev.off()
+
+
+#
+# Now let's focus on imports and exports between NAFTA countries. We will examine datasets from the
+#   governments of the United States and Canada regarding imports and exports.
+#
+
+ie.us.data <- read.csv('data/us-imports-exports.csv')
+ie.ca.data <- read.csv('data/ca-imports-exports.csv')
+
+# We'll start with the U.S data
+ie.us.plot <- ie.us.data %>%
+  filter(CTYNAME == 'Mexico' | CTYNAME == 'Canada') %>%
+  ggplot(aes(x = year, y = IYR, group = CTYNAME)) +
+  geom_line(aes(x = year, y = IYR * 1e6, color = CTYNAME, linetype = '1')) +
+  geom_line(aes(x = year, y = EYR * 1e6, color = CTYNAME, linetype = '5')) +
+  scale_linetype_manual(name = 'Type', values = c(1, 5), labels = c('Imports', 'Exports')) +
+  labs(color = 'Country') +
+  xlab('Year') +
+  ylab('Value of Import/Exports (USD)') +
+  ggtitle('Imports and Exports with the U.S.') +
+  graph.theme()
+NAFTA.label.y <- 3e11 + 2e10
+ie.us.plot <- mark.nafta.start(ie.us.plot)
+ie.us.plot  
+
+# Save this plot
+png('reports/figures/nafta_us_imports_exports.png')
+ie.us.plot
+dev.off()
+
+# Now for Canada
+ie.ca.plot <- rbind(ie.ca.data %>%
+  filter(Sections == 'Total merchandise trade') %>%
+  select(matches('DE|I')) %>%
+  melt(id.vars = c('Sections')) %>%
+  transmute(
+    year = as.numeric(gsub('DE|I', '', variable)),
+    type = ifelse(grepl('DE', variable), 'B', 'A'),
+    country = 'Mexico',
+    value = value * 0.76  # this data is in CAD
+  ),
+  ie.us.data %>%
+    filter(CTYNAME == 'Canada') %>%
+    transmute(
+      year = year,
+      country = 'United States',
+      B = IYR * 1e6,  # this data is in millions
+      A = EYR * 1e6
+    ) %>%
+    melt(id.vars = c('year', 'country'), variable.name = 'type')
+) %>%
+  mutate(
+    country.type = paste(country, type)
+  ) %>%
+  ggplot(aes(x = year, y = value, group = country.type)) +
+  geom_line(aes(x = year, y = value, color = country, linetype = type)) +
+  scale_linetype_manual(name = 'Type', values = c(1, 5), labels = c('Imports', 'Exports')) +
+  scale_y_log10() +
+  labs(color = 'Country') +
+  xlab('Year') +
+  ylab('Value of Import/Exports (USD)') +
+  ggtitle('Imports and Exports with Canada') +
+  graph.theme()
+NAFTA.label.y <- 5e10
+ie.ca.plot <- mark.nafta.start(ie.ca.plot)
+ie.ca.plot
+
+# Save this plot
+png('reports/figures/nafta_ca_imports_exports.png')
+ie.ca.plot
+dev.off()
+
+# And finally, Mexico
+ie.mx.plot <- rbind(
+  ie.ca.data %>%
+    filter(Sections == 'Total merchandise trade') %>%
+    select(matches('DE|I')) %>%
+    melt(id.vars = c('Sections')) %>%
+    transmute(
+      year = as.numeric(gsub('DE|I', '', variable)),
+      type = ifelse(grepl('DE', variable), 'A', 'B'),
+      country = 'Canada',
+      value = value * 0.76  # this data is in CAD
+  ),
+  ie.us.data %>%
+    filter(CTYNAME == 'Mexico') %>%
+    transmute(
+      year = year,
+      country = 'United States',
+      B = IYR * 1e6,  # this data is in millions
+      A = EYR * 1e6
+    ) %>%
+    melt(id.vars = c('year', 'country'), variable.name = 'type')
+) %>%
+  mutate(
+    country.type = paste(country, type)
+  ) %>%
+  ggplot(aes(x = year, y = value, group = country.type)) +
+  geom_line(aes(x = year, y = value, color = country, linetype = type)) +
+  scale_linetype_manual(name = 'Type', values = c(1, 5), labels = c('Imports', 'Exports')) +
+  scale_y_log10() +
+  labs(color = 'Country') +
+  xlab('Year') +
+  ylab('Value of Import/Exports (USD)') +
+  ggtitle('Imports and Exports with Mexico') +
+  graph.theme()
+NAFTA.label.y <- 3e11 - 1e10
+ie.mx.plot <- mark.nafta.start(ie.mx.plot)
+ie.mx.plot
+
+# Save this plot
+png('reports/figures/nafta_mx_imports_exports.png')
+ie.mx.plot
 dev.off()
 
 
