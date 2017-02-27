@@ -2,6 +2,7 @@
 # In this script we look at economic data for the three countries in NAFTA
 #
 library(ggplot2)
+library(ggmap)
 library(reshape2)
 library(tidyverse)
 
@@ -96,7 +97,10 @@ growth.plot <- ggplot(growth.data,
   xlab('Year') +
   ylab('Growth (Percent Change in GDP)') +
   ggtitle('GDP Growth of NAFTA Member Countries') +
-  graph.theme()
+  graph.theme() +
+  theme(
+    plot.title = element_text(hjust = 1, size = 21)
+  )
 
 NAFTA.label.y <- 9
 growth.plot <- mark.nafta.start(growth.plot)
@@ -128,7 +132,10 @@ growth.avgs.plot <- ggplot(growth.avgs,
   xlab('Country') +
   ylab('Average Percentage Growth of GDP') +
   ggtitle('Average GDP Growth Before and After NAFTA') +
-  graph.theme()
+  graph.theme() +
+  theme(
+    plot.title = element_text(hjust = 1, size = 21)
+  )
 growth.avgs.plot
 
 # Save this plot
@@ -307,5 +314,81 @@ ie.mx.plot
 png('reports/figures/nafta_mx_imports_exports.png')
 ie.mx.plot
 dev.off()
+
+
+#
+# Make a map of the NAFTA countries
+#
+
+map.theme <- function() {
+  theme(
+    legend.position = "bottom",
+    plot.background = element_rect(fill = white, color = white),
+    panel.background = element_rect(fill = white),
+    axis.text = element_blank(),
+    plot.title = element_text(color = dark.blue, face = "bold", size = 24, vjust = 1),
+    axis.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+}
+
+nafta.map.data <- map_data('world', region = c('USA', 'Canada', 'Mexico'))
+nafta.map <- ggplot() +
+  geom_map(data = nafta.map.data, map = nafta.map.data,
+           aes(x=long, y=lat, map_id=region, fill = region)) +
+  xlim(-180, -50) + 
+  labs(fill = 'Country') +
+  map.theme()
+nafta.map
+
+# Save this plot
+png('reports/figures/nafta_map.png')
+nafta.map
+dev.off()
+
+
+# Who are the United States' biggest trading partners?
+us.trading.partners.ranked <- ie.us.data %>%
+  filter(year == 2016) %>%
+  transmute(
+    country = CTYNAME,
+    total.trade = IYR + EYR) %>%
+  arrange(desc(total.trade))
+
+'%!in%' <- function(x,y)!('%in%'(x,y))
+us.trading.partners.plot <- us.trading.partners.ranked %>%
+  filter(country %!in% c('OPEC', 'World, Seasonally Adjusted', 'World, Not Seasonally Adjusted',
+                        'Asia', 'Pacific Rim', 'North America', 'Europe', 'Advance Technology Products',
+                        'European Union', 'South and Central America', 'NAFTA with Canada (Consump)',
+                        'NAFTA with Mexico (Consump)')) %>%
+  .[1:10,] %>%
+  mutate(highlight = country %in% nafta.countries) %>%
+  ggplot() +
+  geom_bar(stat = 'identity', aes(x = reorder(country, total.trade), y = total.trade,
+                                  fill = highlight)) +
+  scale_fill_manual(values = c(gray(0.7), blue)) +
+  xlab('Country') +
+  ylab('Imports + Exports (Millions, USD)') +
+  ggtitle('Top 10 U.S. Trading Partners in 2016') +
+  coord_flip() +
+  graph.theme() + 
+  theme(
+    legend.position = 'none',
+    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 'cm'),
+    plot.title = element_text(hjust = 1.2)
+  )
+us.trading.partners.plot
+
+# Save this plot
+png('reports/figures/us_top_trading_partners.png')
+us.trading.partners.plot
+dev.off()
+
 
 
