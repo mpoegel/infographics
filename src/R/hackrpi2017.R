@@ -8,8 +8,8 @@ library(waffle)
 red <- '#C03328'
 dark.red <- '#C1261A'
 dark.red2 <- '#8c0000'
-off.white <- gray(0.95)
-background <- gray(0.2)
+foreground <- gray(0.2)
+background <- gray(0.95)
 load.fontawesome()
 
 
@@ -80,7 +80,7 @@ ggplot(interests.areas, aes(x = label, y = percentage)) +
 backend.waffle <- waffle(c('Backend'=66, '-'=34),
                          rows=5,
                          size=0,
-                         colors = c(red, gray(0.4)),
+                         colors = c(red, gray(0.7)),
                          #use_glyph = 'database',
                          legend_pos = 'non') +
   theme(
@@ -126,54 +126,57 @@ number.size <- 48
 label.size <- 12
 # first row
 grid.text(num.unique.schools,
-          x = unit(0.15, 'npc'), y = unit(0.72, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = number.size))
+          x = unit(0.16, 'npc'), y = unit(0.72, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = number.size))
 grid.text("unique schools registered",
-          x = unit(0.1, 'npc'), y = unit(0.67, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = label.size))
-grid.text("2 of 3",
-          x = unit(0.55, 'npc'), y = unit(0.70, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = number.size))
+          x = unit(0.11, 'npc'), y = unit(0.67, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = label.size))
+grid.text("2    3",
+          x = unit(0.56, 'npc'), y = unit(0.70, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = number.size))
+grid.text("in\nevery",
+          x = unit(0.645, 'npc'), y = unit(0.70, 'npc'), just = 'center',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = label.size))
 print(backend.waffle + theme(plot.margin=margin(-2, 2, 2, -2, unit="cm")),
       vp = vplayout(3, 3:4))
 grid.text("students were interested in backend development",
-          x = unit(0.43, 'npc'), y = unit(0.65, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = label.size))
+          x = unit(0.44, 'npc'), y = unit(0.65, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = label.size))
 
 # second row
 grid.text(slices.of.pizza,
-          x = unit(0.13, 'npc'), y = unit(0.57, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = number.size))
+          x = unit(0.14, 'npc'), y = unit(0.58, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = number.size))
 grid.text("slices of pizza consumed",
-          x = unit(0.11, 'npc'), y = unit(0.52, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = label.size))
+          x = unit(0.12, 'npc'), y = unit(0.53, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = label.size))
 
 # figures
 grid.text("Why do students hack at HackRPI?",
           x = unit(0.10, 'npc'), y = unit(0.46, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = 24))
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = 24))
 print(interests.plot + theme(plot.margin=margin(-1, 0, 1, 1.5, unit="cm")),
       vp = vplayout(4, 1:3))
 
 # final rows of numbers
 grid.text(farthest.distance.traveled,
-          x = unit(0.15, 'npc'), y = unit(0.18, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = number.size))
-grid.text("farthest distance traveled\nto HackRPI",
+          x = unit(0.14, 'npc'), y = unit(0.18, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = number.size))
+grid.text("most miles traveled to\nHackRPI",
           x = unit(0.13, 'npc'), y = unit(0.13, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = label.size))
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = label.size))
 grid.text(num.projects,
-          x = unit(0.45, 'npc'), y = unit(0.18, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = number.size))
+          x = unit(0.46, 'npc'), y = unit(0.18, 'npc'), just = 'left',
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = number.size))
 grid.text("projects created",
           x = unit(0.43, 'npc'), y = unit(0.13, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = label.size))
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = label.size))
 grid.text(percent.no.prior.hackathons,
           x = unit(0.67, 'npc'), y = unit(0.18, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = number.size))
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = number.size))
 grid.text("percent of students with no\nprior hackathon experience",
           x = unit(0.645, 'npc'), y = unit(0.13, 'npc'), just = 'left',
-          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = label.size))
+          gp = gpar(fontfamily = 'Segoe UI', col = foreground, fontsize = label.size))
 
 # footer
 grid.rect(
