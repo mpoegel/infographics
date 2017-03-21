@@ -101,9 +101,12 @@ backend.waffle
 # Make the infographic!
 #
 vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+windowsFonts('Segoe UI'=windowsFont('Segoe UI'))
 
-cairo_pdf('./reports/figures/hackrpi2017.pdf', width = 8.5, height = 11,
-          family = 'Arial Unicode MS')
+# png('./reports/figures/hackrpi2017.png', width = 8.5, height = 11, units = "in", res = 300,
+#     family = 'Segoe UI')
+cairo_pdf('./reports/figures/hackrpi2017.png', width = 8.5, height = 11,
+    family = 'Segoe UI')
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(nrow=5, ncol=4)))
 grid.rect(gp = gpar(fill = background, col = background))
