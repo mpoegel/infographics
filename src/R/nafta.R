@@ -3,7 +3,9 @@
 #
 library(ggplot2)
 library(ggmap)
+library(grid)
 library(reshape2)
+library(scales)
 library(tidyverse)
 
 main.font <- 'Bookman Old Style'
@@ -354,7 +356,7 @@ dev.off()
 
 
 # Who are the United States' biggest trading partners?
-us.trading.partners.ranked <- ie.us.data %>%
+us.trading.partners.2016.ranked <- ie.us.data %>%
   filter(year == 2016) %>%
   transmute(
     country = CTYNAME,
@@ -362,33 +364,86 @@ us.trading.partners.ranked <- ie.us.data %>%
   arrange(desc(total.trade))
 
 '%!in%' <- function(x,y)!('%in%'(x,y))
-us.trading.partners.plot <- us.trading.partners.ranked %>%
-  filter(country %!in% c('OPEC', 'World, Seasonally Adjusted', 'World, Not Seasonally Adjusted',
-                        'Asia', 'Pacific Rim', 'North America', 'Europe', 'Advance Technology Products',
-                        'European Union', 'South and Central America', 'NAFTA with Canada (Consump)',
-                        'NAFTA with Mexico (Consump)')) %>%
+not.countries <- c('OPEC', 'World, Seasonally Adjusted', 'World, Not Seasonally Adjusted',
+                   'Asia', 'Pacific Rim', 'North America', 'Europe', 'Advance Technology Products',
+                   'European Union', 'South and Central America', 'NAFTA with Canada (Consump)',
+                   'NAFTA with Mexico (Consump)', 'NICS')
+us.trading.partners.2016.plot <- us.trading.partners.2016.ranked %>%
+  filter(country %!in% not.countries) %>%
   .[1:10,] %>%
   mutate(highlight = country %in% nafta.countries) %>%
   ggplot() +
   geom_bar(stat = 'identity', aes(x = reorder(country, total.trade), y = total.trade,
                                   fill = highlight)) +
   scale_fill_manual(values = c(gray(0.7), blue)) +
-  xlab('Country') +
-  ylab('Imports + Exports (Millions, USD)') +
-  ggtitle('Top 10 U.S. Trading Partners in 2016') +
+  scale_y_continuous(labels=scientific_format(digits = 2)) +
   coord_flip() +
   graph.theme() + 
   theme(
     legend.position = 'none',
     plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 'cm'),
-    plot.title = element_text(hjust = 1.2)
+    plot.title = element_text(hjust = 1.2),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
   )
-us.trading.partners.plot
+us.trading.partners.2016.plot
 
 # Save this plot
-png('reports/figures/us_top_trading_partners.png')
-us.trading.partners.plot
+png('reports/figures/us_top_trading_partners_2016.png')
+us.trading.partners.2016.plot
 dev.off()
 
+us.trading.partners.1993.ranked <- ie.us.data %>%
+  filter(year == 1993) %>%
+  transmute(
+    country = CTYNAME,
+    total.trade = IYR + EYR) %>%
+  arrange(desc(total.trade))
+
+us.trading.partners.1993.plot <- us.trading.partners.1993.ranked %>%
+  filter(country %!in% not.countries) %>%
+  .[1:10,] %>%
+  mutate(highlight = country %in% nafta.countries) %>%
+  ggplot() +
+  geom_bar(stat = 'identity', aes(x = reorder(country, total.trade), y = total.trade,
+                                  fill = highlight)) +
+  scale_fill_manual(values = c(gray(0.7), blue)) +
+  scale_y_continuous(labels=scientific_format(digits = 2)) +
+  coord_flip() +
+  graph.theme() + 
+  theme(
+    legend.position = 'none',
+    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), 'cm'),
+    plot.title = element_text(hjust = 1.2),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
+us.trading.partners.1993.plot
+
+# Combine the top trader plots into a single image
+vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+
+png('./reports/figures/us_top_trading_partners.png', width = 8, height = 4, units = "in",
+    res = 300)
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(nrow=1, ncol=2)))
+grid.rect(gp = gpar(fill = white, col = white))
+print(us.trading.partners.1993.plot + theme(plot.margin=margin(2, 0.5, 1, 0.5, unit="cm")),
+      vp = vplayout(1, 1))
+print(us.trading.partners.2016.plot + theme(plot.margin=margin(2, 0.5, 1, 0, unit="cm")),
+      vp = vplayout(1, 2))
+grid.text('Top Trading Partners with the U.S.',
+          x = unit(0.5, 'npc'), y = unit(0.94, 'npc'), just = 'center',
+          gp = gpar(col = dark.blue, fontsize = 20))
+grid.text('1993',
+          x = unit(0.25, 'npc'), y = unit(0.85, 'npc'), just = 'center',
+          gp = gpar(col = dark.blue, fontsize = 12))
+grid.text('2016',
+          x = unit(0.75, 'npc'), y = unit(0.85, 'npc'), just = 'center',
+          gp = gpar(col = dark.blue, fontsize = 12))
+grid.text('Total Trade, Millions USD',
+          x = unit(0.5, 'npc'), y = unit(0.05, 'npc'), just = 'center',
+          gp = gpar(col = dark.blue, fontsize = 14))
+dev.off()
 
 
