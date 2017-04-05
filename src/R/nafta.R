@@ -447,3 +447,76 @@ grid.text('Total Trade, Millions USD',
 dev.off()
 
 
+#
+# Let's make a timeline of everything we learned
+#
+# color pallete: http://paletton.com/#uid=12P0u0kllllaFw0g0qFqFg0w0aF
+green <- '#2D882D'
+dark.green <- '#116611'
+light.green <- '#55AA55'
+darker.green <- '#004400'
+dark.gray <- gray(0.2)
+
+background.color <- green
+title.font.size <- 36
+subtitle.font.size <- 20
+detail.font.size <- 12
+
+time.data <- data.frame(x = c(1988, 2017), y = c(0, 0))
+events <- data.frame(x = c(1994, 1994, 2017, 2017), y = c(0, 1, 0, 0.1), g = c(0,0,1,1))
+event.details <- data.frame(
+  x = c(1994, 2017),
+  y = c(1, 0.1),
+  label = c(
+    'NAFTA came into effect.',
+    'You are here.'
+  )
+)
+
+timeline <- ggplot() +
+  geom_point(data = time.data, aes(x = x, y = y), color = off.white) +
+  geom_line(data = events, aes(x = x, y = y, group = g), color = light.green, linetype = 5) +
+  geom_label(data = event.details, aes(x = x, y = y, label = label), color = NA, fill = off.white) +
+  geom_text(data = event.details, aes(x = x, y = y, label = label), color = dark.gray) +
+  scale_x_continuous(breaks = seq(1988, 2017)) +
+  scale_y_continuous(limits = c(0, 1.5), expand = c(0, 0)) +
+  map.theme() +
+  theme(
+    plot.background = element_rect(fill = off.white, color = off.white),
+    panel.background = element_rect(fill = off.white),
+    axis.ticks.x = element_line(color = darker.green),
+    axis.text = element_text(color = dark.green),
+    axis.text.y = element_blank(),
+    axis.line.x = element_line(color = darker.green)
+  )
+timeline
+
+cairo_pdf('./reports/figures/nafta_timeline.pdf', width = 15, height = 6,
+          family = 'Segoe UI')
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(nrow = 5, ncol = 15)))
+grid.rect(gp = gpar(fill = background.color, col = background.color))
+# Create the x-axis for time on the bottom
+print(timeline, vp = vplayout(1:4, 1:15))
+
+# Create the header
+grid.text('The North American Free Trade Agreement',
+          x = unit(0.5, 'npc'), y = unit(0.93, 'npc'), just = 'center',
+          gp = gpar(fontfamily = 'Segoe UI', col = dark.green, fontsize = title.font.size))
+grid.text('A timeline of events for NAFTA',
+          x = unit(0.5, 'npc'), y = unit(0.85, 'npc'), just = 'center',
+          gp = gpar(fontfamily = 'Segoe UI', col = dark.green, fontsize = subtitle.font.size))
+
+# Add the events
+
+
+# Create the footer
+grid.text('Created By Matt Poegel',
+          x = unit(0.99, 'npc'), y = unit(0.04, 'npc'), just = 'right',
+          gp = gpar(fontfamily = 'Segoe UI', col = off.white, fontsize = detail.font.size))
+
+
+dev.off()
+
+
+
